@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Heart, Sparkles } from 'lucide-react';
+import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Sparkles } from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -22,29 +22,34 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
 
   return (
     <>
-      {/* 遮罩層：當側邊欄打開時，背景變暗（點擊背景可收起） */}
+      {/* 遮罩層 (點擊背景關閉) */}
       <div 
-        className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        className={`fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose} 
       />
 
-      {/* 側邊欄：不再有 lg:translate-x-0，完全由 isOpen 控制 */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-[#fdfcfb] border-r border-[#eaddc5] z-[110] transition-transform duration-500 ease-in-out transform 
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
+      {/* 側邊欄主體 */}
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F8F5F2] border-r border-[#EADDD5] z-[110] transition-transform duration-500 ease-in-out transform 
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl shadow-black/5`}>
         
         <div className="p-8 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-10">
+          
+          {/* 標題區域 */}
+          <div className="flex justify-between items-start mb-10">
             <div>
-              <h2 className="text-xl font-bold text-[#5e5045] font-serif">分類導覽</h2>
-              <p className="text-[10px] text-stone-400 uppercase tracking-widest mt-1">LILY GARDEN LIBRARY</p>
+              <h2 className="text-[22px] font-bold text-[#5E5045] font-serif tracking-tight">分類導覽</h2>
+              <div className="mt-2 text-[11px] text-[#A8A29E] leading-relaxed">
+                <p>圖書登記清單</p>
+                <p>百合花開的世界</p>
+              </div>
             </div>
-            {/* 側邊欄內的關閉按鈕 */}
-            <button onClick={onClose} className="p-2 text-stone-400 hover:text-[#8c7b6d] transition-colors">
-              <X size={24}/>
+            <button onClick={onClose} className="p-1 text-[#A8A29E] hover:text-[#5E5045] transition-colors">
+              <X size={24} strokeWidth={1.5} />
             </button>
           </div>
 
-          <nav className="flex-1 space-y-2">
+          {/* 導覽按鈕清單 */}
+          <nav className="flex-1 space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isSelected = selectedCategory === item.id;
@@ -52,23 +57,41 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
                 <button 
                   key={item.id} 
                   onClick={() => { onSelectCategory(item.id as any); onClose(); }}
-                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${isSelected ? 'bg-[#8c7b6d] text-white shadow-lg' : 'text-[#8c7b6d] hover:bg-[#f0ece6]'}`}
+                  className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-[18px] transition-all duration-300 group
+                    ${isSelected 
+                      ? 'bg-[#8C7B6D] text-white shadow-lg shadow-[#8C7B6D]/30' 
+                      : 'text-[#5E5045] hover:bg-[#F0ECE6]/60'
+                    }`}
                 >
-                  <Icon size={20} /> <span className="font-medium">{item.label}</span>
+                  <Icon 
+                    size={20} 
+                    strokeWidth={isSelected ? 2 : 1.5}
+                    className={isSelected ? 'text-white' : 'text-[#5E5045] opacity-70'} 
+                  /> 
+                  <span className={`text-[15px] ${isSelected ? 'font-medium' : 'font-normal'}`}>
+                    {item.label}
+                  </span>
                 </button>
               );
             })}
           </nav>
 
-          {/* 底部甲片按鈕 */}
-          <div className="pt-6 border-t border-[#eaddc5]">
+          {/* 分隔線與底部按鈕 */}
+          <div className="pt-6 border-t border-[#EADDD5]">
             <button 
               onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
-              className={`w-full flex items-center justify-center gap-3 p-5 rounded-2xl border transition-all 
-              ${selectedCategory === Category.GAY ? 'bg-[#2e2a1c] text-white shadow-inner' : 'bg-[#f0ece6] border-[#eaddc5] text-[#8c7b6d] hover:bg-[#eaddc5]'}`}
+              className={`w-full flex items-center justify-center gap-2.5 p-4 rounded-[20px] border transition-all duration-300
+              ${selectedCategory === Category.GAY 
+                ? 'bg-[#5E5045] text-white border-transparent shadow-md' 
+                : 'bg-[#F0ECE6] border-[#E6E0D9] text-[#8C7B6D] hover:bg-[#EADDD5]'
+              }`}
             >
-              <Sparkles size={18} className={selectedCategory === Category.GAY ? 'fill-yellow-400' : 'text-yellow-600'} />
-              <span className="font-bold">✨ 甲片 ver.</span>
+              <Sparkles 
+                size={18} 
+                className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D] opacity-70'} 
+                strokeWidth={2}
+              />
+              <span className="text-[14px] font-bold tracking-wide">甲片 ver.</span>
             </button>
           </div>
         </div>
