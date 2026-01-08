@@ -1,30 +1,30 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send();
-  
-  // 這裡最關鍵：我們把 password 和 createdAt 拿出來，剩下的才叫 body
-  // 這樣 createdAt 就不會被送進資料庫報錯了
-  const { password, createdAt, ...body } = req.body;
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
+  const { password, data } = req.body;
+
+  // 1. 驗證密碼
   if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: '密碼錯誤' });
+    return res.status(401).json({ message: '密碼錯誤' });
   }
 
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/collection`, {
-    method: 'POST',
-    headers: {
-      'apikey': process.env.SUPABASE_KEY,
-      'Authorization': `Bearer ${process.env.SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    // body 裡面現在保證沒有 createdAt 了
-    body: JSON.stringify(body) 
-  });
+  // 2. 重點：解構賦值，把 createdAt 抓出來但不使用它，將剩餘的存入 cleanData
+  // 同時也要排除 id，因為新增時 id 由資料庫自動生成
+  const { createdAt, id, ...cleanData } = data;
 
-  if (response.ok) {
-    res.status(200).json({ message: '成功存入資料庫！' });
-  } else {
-    const errorData = await response.json();
-    res.status(500).json({ error: `資料庫拒絕了！原因：${errorData.message}` });
+  const { data: insertedData, error } = await supabase
+    .from('collection')
+    .insert([cleanData]) // 這裡只傳送 cleanData
+    .select();
+
+  if (error) {
+    console.error('Supabase Error:', error);
+    return res.status(500).json({ error: error.message });
   }
+
+  return res.status(200).json(insertedData);
 }
