@@ -80,28 +80,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* 底部按鈕：專屬甲片 ver. */}
-          <div className="pt-6 border-t border-[#E2DDD9]">
-            <button 
-              onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
-              className={`w-full flex items-center justify-center gap-2.5 p-4 rounded-[20px] border transition-all duration-300
-              ${selectedCategory === Category.GAY 
-                ? 'bg-[#5E5045] text-white border-transparent' 
-                : 'bg-[#EAE4DD] border-[#DED8D1] text-[#8C7B6D] hover:bg-[#EADDD5]'
-              }`}
-            >
-              <Sparkles 
-                size={18} 
-                className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D]'} 
-                strokeWidth={2}
-              />
-              <span className="text-[15px] font-bold tracking-wider"> 甲片 ver.</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-    </>
-  );
-};
-
-export default Sidebar;
+     {/* 底部按鈕：精確還原右圖樣式 */}
+<div className="pt-6 border-t border-[#E2DDD9]">
+  <button 
+    onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
+    className={`w-full flex items-center justify-center gap-2.5 p-3.5 rounded-[22px] border transition-all duration-300
+    ${selectedCategory === Category.GAY 
+      ? 'bg-[#5E5045] text-white border-transparent' 
+      : 'bg-[#EAE4DD] border-[#DED8D1] text-[#8C7B6D] hover:bg-[#E2DDD9]'
+    }`}
+  >
+    {/* 只有一個線條星星，不要 Emoji */}
+    <Sparkles 
+      size={18} 
+      strokeWidth={1.5}
+      className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D]'} 
+    />
+    <span className="text-[15px] font-medium tracking-tight">甲片 ver.</span>
+  </button>
+</div>
