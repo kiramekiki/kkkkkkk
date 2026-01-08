@@ -1,14 +1,14 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send();
   
-  const { password, ...body } = req.body;
+  // 這裡最關鍵：我們把 password 和 createdAt 拿出來，剩下的才叫 body
+  // 這樣 createdAt 就不會被送進資料庫報錯了
+  const { password, createdAt, ...body } = req.body;
 
-  // 1. 檢查管理員密碼
   if (password !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: '密碼錯誤' });
   }
 
-  // 2. 送去 Supabase (移除了會報錯的 createdAt)
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/collection`, {
     method: 'POST',
     headers: {
@@ -17,7 +17,8 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json',
       'Prefer': 'return=minimal'
     },
-    body: JSON.stringify(body) // 直接傳送資料，Supabase 會自動填入 created_at
+    // body 裡面現在保證沒有 createdAt 了
+    body: JSON.stringify(body) 
   });
 
   if (response.ok) {
