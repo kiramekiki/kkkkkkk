@@ -1,99 +1,94 @@
 import React from 'react';
-import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Sparkles } from 'lucide-react';
 import { Category } from '../types';
+import { BookOpen, Film, Tv, Book, Gamepad2, LayoutGrid, X, Clapperboard, Sparkles } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   selectedCategory: Category | 'ALL';
-  onSelectCategory: (category: Category | 'ALL') => void;
+  onSelectCategory: (cat: Category | 'ALL') => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, onSelectCategory }) => {
-  const menuItems = [
+  const categories = [
     { id: 'ALL', label: '全部收藏', icon: LayoutGrid },
-    { id: Category.MANGA, label: '漫畫', icon: BookOpen },
-    { id: Category.NOVEL, label: '小說', icon: Book },
-    { id: Category.MOVIE, label: '電影', icon: Film },
-    { id: Category.ANIMATION, label: '動畫', icon: Tv },
-    { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
-    { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
+    { id: Category.MANGA, label: Category.MANGA, icon: BookOpen },
+    { id: Category.NOVEL, label: Category.NOVEL, icon: Book },
+    { id: Category.MOVIE, label: Category.MOVIE, icon: Film },
+    { id: Category.ANIMATION, label: Category.ANIMATION, icon: Tv },
+    { id: Category.GAME, label: Category.GAME, icon: Gamepad2 },
+    { id: Category.DRAMA_SERIES, label: Category.DRAMA_SERIES, icon: Clapperboard },
   ];
 
   return (
     <>
-      {/* 遮罩層 (點擊背景關閉) */}
+      {/* Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
-        onClick={onClose} 
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
       />
 
-      {/* 側邊欄主體 */}
-      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F8F5F2] border-r border-[#EADDD5] z-[110] transition-transform duration-500 ease-in-out transform 
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl shadow-black/5`}>
-        
-        <div className="p-8 flex flex-col h-full">
-          
-          {/* 標題區域 */}
-          <div className="flex justify-between items-start mb-10">
-            <div>
-              <h2 className="text-[22px] font-bold text-[#5E5045] font-serif tracking-tight">分類導覽</h2>
-              <div className="mt-2 text-[11px] text-[#A8A29E] leading-relaxed">
-                <p>圖書登記清單</p>
-                <p>百合花開的世界</p>
-              </div>
-            </div>
-            <button onClick={onClose} className="p-1 text-[#A8A29E] hover:text-[#5E5045] transition-colors">
-              <X size={24} strokeWidth={1.5} />
-            </button>
+      {/* Sidebar Content */}
+      <aside 
+        className={`
+          fixed top-0 left-0 h-full w-64 bg-earth-100 dark:bg-stone-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-r border-earth-200 dark:border-stone-700
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <div className="p-6 flex justify-between items-center">
+          <span className="text-xl font-bold text-earth-800 dark:text-earth-100">分類導覽</span>
+          <button onClick={onClose} className="text-earth-600 dark:text-earth-300 hover:text-earth-800 dark:hover:text-earth-100 transition-colors">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="mt-4 px-4">
+          <div className="mb-8 px-4">
+             <h2 className="text-sm font-bold uppercase tracking-wider text-earth-500 dark:text-earth-400">
+               圖書登記清單
+             </h2>
+             <p className="text-xs text-earth-400 mt-1">百合花開的世界</p>
           </div>
 
-          {/* 導覽按鈕清單 */}
-          <nav className="flex-1 space-y-1">
-            {menuItems.map((item) => {
+          <nav className="space-y-2">
+            {categories.map((item) => {
               const Icon = item.icon;
               const isSelected = selectedCategory === item.id;
+              
               return (
-                <button 
-                  key={item.id} 
-                  onClick={() => { onSelectCategory(item.id as any); onClose(); }}
-                  className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-[18px] transition-all duration-300 group
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onSelectCategory(item.id as Category | 'ALL');
+                    onClose();
+                  }}
+                  className={`
+                    w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
                     ${isSelected 
-                      ? 'bg-[#8C7B6D] text-white shadow-lg shadow-[#8C7B6D]/30' 
-                      : 'text-[#5E5045] hover:bg-[#F0ECE6]/60'
-                    }`}
+                      ? 'bg-earth-500 text-white shadow-md' 
+                      : 'text-earth-700 dark:text-stone-300 hover:bg-earth-200 dark:hover:bg-stone-700'
+                    }
+                  `}
                 >
-                  <Icon 
-                    size={20} 
-                    strokeWidth={isSelected ? 2 : 1.5}
-                    className={isSelected ? 'text-white' : 'text-[#5E5045] opacity-70'} 
-                  /> 
-                  <span className={`text-[15px] ${isSelected ? 'font-medium' : 'font-normal'}`}>
-                    {item.label}
-                  </span>
+                  <span className="w-5 flex justify-center"><Icon size={18} /></span>
+                  <span>{item.label}</span>
                 </button>
               );
             })}
           </nav>
-
-          {/* 分隔線與底部按鈕 */}
-          <div className="pt-6 border-t border-[#EADDD5]">
-            <button 
-              onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
-              className={`w-full flex items-center justify-center gap-2.5 p-4 rounded-[20px] border transition-all duration-300
-              ${selectedCategory === Category.GAY 
-                ? 'bg-[#5E5045] text-white border-transparent shadow-md' 
-                : 'bg-[#F0ECE6] border-[#E6E0D9] text-[#8C7B6D] hover:bg-[#EADDD5]'
-              }`}
-            >
-              <Sparkles 
-                size={18} 
-                className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D] opacity-70'} 
-                strokeWidth={2}
-              />
-              <span className="text-[14px] font-bold tracking-wide">甲片 ver.</span>
-            </button>
-          </div>
+        </div>
+        
+        <div className="absolute bottom-8 left-0 w-full px-6">
+          <button 
+            onClick={() => {
+                onSelectCategory(Category.GAY);
+                onClose();
+            }}
+            className="w-full py-3 bg-[#ebe3d5] dark:bg-stone-700 hover:bg-[#e2d8c9] dark:hover:bg-stone-600 text-[#8c7b6d] dark:text-earth-200 rounded-xl text-sm font-bold shadow-soft transition-all active:scale-95 flex items-center justify-center gap-2 border border-[#d4c5a8]/30 dark:border-stone-600"
+          >
+            <Sparkles size={16} className="text-[#a89988]" />
+            <span>甲片 ver.</span>
+          </button>
         </div>
       </aside>
     </>
