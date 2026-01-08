@@ -43,94 +43,6 @@ const App: React.FC = () => {
   const ratingDropdownRef = useRef<HTMLDivElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Sample entries for all categories when DB is empty
-  const sampleEntries: Entry[] = useMemo(() => [
-    {
-      id: 'sample-manga',
-      title: '終將成為妳 (範例)',
-      author: '仲谷鳰',
-      category: Category.MANGA,
-      rating: Rating.BIBLE,
-      coverUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '細膩描繪「喜歡」的本質。這是一個 Manga 分類的範例卡片。',
-      tags: ['校園', '百合', '成長'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 1000
-    },
-    {
-      id: 'sample-novel',
-      title: '安達與島村 (範例)',
-      author: '入間人間',
-      category: Category.NOVEL,
-      rating: Rating.TOP_TIER,
-      coverUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '緩慢而溫柔的情感流動。這是一個 Novel 分類的範例卡片。',
-      tags: ['輕小說', '日常'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 2000
-    },
-    {
-      id: 'sample-movie',
-      title: '燃燒女子的畫像 (範例)',
-      author: '瑟琳·席安瑪',
-      category: Category.MOVIE,
-      rating: Rating.BIBLE,
-      coverUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '凝視與被凝視的藝術。這是一個 Movie 分類的範例卡片。',
-      tags: ['法國', '藝術'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 3000
-    },
-    {
-      id: 'sample-anime',
-      title: '利茲與青鳥 (範例)',
-      author: '山田尚子',
-      category: Category.ANIMATION,
-      rating: Rating.TOP_TIER,
-      coverUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '吹響吧！上低音號外傳。這是一個 Animation 分類的範例卡片。',
-      tags: ['音樂', '唯美'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 4000
-    },
-    {
-      id: 'sample-game',
-      title: '符文工廠 5 (範例)',
-      author: 'Marvelous',
-      category: Category.GAME,
-      rating: Rating.ORDINARY,
-      coverUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '奇幻經營與冒險。這是一個 Game 分類的範例卡片。',
-      tags: ['RPG', '經營'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 5000
-    },
-    {
-      id: 'sample-series',
-      title: '第一次遇見花香的那刻 (範例)',
-      author: '鄧依涵',
-      category: Category.DRAMA_SERIES,
-      rating: Rating.TOP_TIER,
-      coverUrl: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '台灣拉劇經典。這是一個 Series 分類的範例卡片。',
-      tags: ['台劇', '成人'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 6000
-    },
-    {
-      id: 'sample-gay',
-      title: 'GAY 作品登記 (範例)',
-      author: 'GAY 創作者',
-      category: Category.GAY,
-      rating: Rating.DESTINY,
-      coverUrl: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=200&h=300',
-      note: '專屬特別分類。這是一個 GAY 分類的範例卡片。',
-      tags: ['特別', '獨家'],
-      plurkUrl: 'https://www.plurk.com',
-      createdAt: Date.now() - 7000
-    }
-  ], []);
-
   // --- Data Fetching ---
   const fetchEntries = async () => {
     setIsLoading(true);
@@ -181,9 +93,7 @@ const App: React.FC = () => {
 
   // --- Filter & Sort Logic ---
   const processedEntries = useMemo(() => {
-    const baseEntries = (entries.length === 0 && !isLoading) ? sampleEntries : entries;
-
-    let result = baseEntries.filter(entry => {
+    let result = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
       const matchesSearch = 
@@ -197,32 +107,23 @@ const App: React.FC = () => {
 
     // Sorting
     result.sort((a, b) => {
-      if (sortBy === 'date-desc') return b.createdAt - a.createdAt;
-      if (sortBy === 'date-asc') return a.createdAt - b.createdAt;
+      if (sortBy === 'date-desc') return (b.createdAt || 0) - (a.createdAt || 0);
+      if (sortBy === 'date-asc') return (a.createdAt || 0) - (b.createdAt || 0);
       if (sortBy === 'rating-desc') return RATING_WEIGHTS[b.rating] - RATING_WEIGHTS[a.rating];
       if (sortBy === 'rating-asc') return RATING_WEIGHTS[a.rating] - RATING_WEIGHTS[b.rating];
       return 0;
     });
 
     return result;
-  }, [entries, isLoading, selectedCategory, selectedRating, searchTerm, sortBy, sampleEntries]);
+  }, [entries, selectedCategory, selectedRating, searchTerm, sortBy]);
 
   // --- Actions ---
   const handleEdit = (entry: Entry) => {
-    if (entry.id.startsWith('sample-')) {
-      alert('這是範例作品，您可以直接新增自己的作品！');
-      return;
-    }
     setEditingEntry(entry);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (entryId: string) => {
-    if (entryId.startsWith('sample-')) {
-      alert('範例作品無法刪除。');
-      return;
-    }
-
     const password = prompt('請輸入管理員密碼以確認刪除：');
     if (!password) return;
 
@@ -268,6 +169,7 @@ const App: React.FC = () => {
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
     { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
     { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
+    { id: Category.GAY, label: '甲片 ver.', icon: Heart }, // 新增這行！
   ];
 
   const sortOptions = [
@@ -289,14 +191,19 @@ const App: React.FC = () => {
   return (
     <div className="flex min-h-screen w-full overflow-hidden bg-earth-50 dark:bg-[#191919] transition-colors duration-300 font-sans">
       
+      {/* 側邊欄：現在所有螢幕大小都由 sidebarOpen 控制 */}
       <Sidebar 
         isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} 
         selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory}
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
+        {/* 選單按鈕與切換主題 */}
         <div className="flex justify-between items-center px-6 py-4 z-20">
-            <button onClick={() => setSidebarOpen(true)} className="p-2 text-earth-600 dark:text-earth-300 hover:bg-earth-200 dark:hover:bg-stone-800 rounded-lg transition-colors">
+            <button 
+              onClick={() => setSidebarOpen(true)} 
+              className="p-3 bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 rounded-xl text-earth-600 dark:text-earth-300 hover:scale-105 transition-all"
+            >
               <Menu size={20} />
             </button>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full hover:bg-earth-200 dark:hover:bg-stone-800 text-earth-600 dark:text-earth-300 transition-colors">
@@ -450,12 +357,6 @@ const App: React.FC = () => {
                         {entry.tags?.slice(0, 3).map(tag => <span key={tag} className="text-[10px] bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 px-2 py-0.5 rounded">#{tag}</span>)}
                       </div>
                     </div>
-                    
-                    {entry.id.startsWith('sample-') && (
-                      <div className="absolute top-0 left-0 bg-stone-800/80 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter rounded-br backdrop-blur-sm">
-                        PREVIEW
-                      </div>
-                    )}
                     
                     {/* Direct Plurk Link Icon (Grid view) - Custom Monochromatic P */}
                     {entry.plurkUrl && (
