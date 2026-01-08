@@ -3,22 +3,33 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   const { password, data } = req.body;
 
   // 1. 驗證密碼
   if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ message: '密碼錯誤' });
+    return res.status(401).json({ message: '密碼錯誤，拒絕寫入' });
   }
 
-  // 2. 重點：解構賦值，把 createdAt 抓出來但不使用它，將剩餘的存入 cleanData
-  // 同時也要排除 id，因為新增時 id 由資料庫自動生成
-  const { createdAt, id, ...cleanData } = data;
+  // 2. 徹底過濾掉會導致報錯的欄位
+  // 我們只拿我們需要的，其餘一律丟棄
+  const cleanData = {
+    title: data.title,
+    author: data.author,
+    category: data.category,
+    rating: data.rating,
+    note: data.note,
+    coverUrl: data.coverUrl,
+    plurkUrl: data.plurkUrl,
+    tags: data.tags || [],
+    library_type: data.library_type
+  };
 
+  // 3. 執行寫入
   const { data: insertedData, error } = await supabase
     .from('collection')
-    .insert([cleanData]) // 這裡只傳送 cleanData
+    .insert([cleanData])
     .select();
 
   if (error) {
