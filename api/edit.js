@@ -1,28 +1,29 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send();
-  
-  // 同樣在這裡把 createdAt 踢掉
-  const { id, password, createdAt, ...body } = req.body;
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+
+  const { password, id, data } = req.body;
 
   if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: '密碼錯誤' });
+    return res.status(401).json({ message: '密碼錯誤' });
   }
 
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/collection?id=eq.${id}`, {
-    method: 'PATCH',
-    headers: {
-      'apikey': process.env.SUPABASE_KEY,
-      'Authorization': `Bearer ${process.env.SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(body)
-  });
+  // 重點：排除掉所有「不允許更新」或「名稱不對」的欄位
+  // id 不可以放在 update 的 body 裡，createdAt 是資料庫自動管理的
+  const { createdAt, created_at, id: _, ...updateData } = data;
 
-  if (response.ok) {
-    res.status(200).json({ message: '修改成功！' });
-  } else {
-    const errorData = await response.json();
-    res.status(500).json({ error: `修改失敗！原因：${errorData.message}` });
+  const { data: updatedData, error } = await supabase
+    .from('collection')
+    .update(updateData)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
   }
+
+  return res.status(200).json(updatedData);
 }
