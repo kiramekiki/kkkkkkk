@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   const { password, id, data } = req.body;
 
@@ -11,10 +11,20 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: '密碼錯誤' });
   }
 
-  // 重點：排除掉所有「不允許更新」或「名稱不對」的欄位
-  // id 不可以放在 update 的 body 裡，createdAt 是資料庫自動管理的
-  const { createdAt, created_at, id: _, ...updateData } = data;
+  // 1. 只挑選資料庫允許更新的欄位
+  const updateData = {
+    title: data.title,
+    author: data.author,
+    category: data.category,
+    rating: data.rating,
+    note: data.note,
+    coverUrl: data.coverUrl,
+    plurkUrl: data.plurkUrl,
+    tags: data.tags,
+    library_type: data.library_type
+  };
 
+  // 2. 執行更新
   const { data: updatedData, error } = await supabase
     .from('collection')
     .update(updateData)
