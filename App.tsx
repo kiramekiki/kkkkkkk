@@ -169,7 +169,6 @@ const App: React.FC = () => {
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
     { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
     { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
-    { id: Category.GAY, label: '甲片 ver.', icon: Heart }, // 新增這行！
   ];
 
   const sortOptions = [
