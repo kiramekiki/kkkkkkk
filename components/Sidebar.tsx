@@ -1,8 +1,5 @@
 import React from 'react';
-import { 
-  X, LayoutGrid, BookOpen, Book, Film, Tv, 
-  Gamepad2, Clapperboard, Sparkles 
-} from 'lucide-react';
+import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Sparkles } from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -13,7 +10,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, onSelectCategory }) => {
-  // 這裡是你指定的分類導覽清單
+  // 按照截圖清單排列
   const menuItems = [
     { id: 'ALL', label: '全部收藏', icon: LayoutGrid },
     { id: Category.MANGA, label: '漫畫', icon: BookOpen },
@@ -26,28 +23,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
 
   return (
     <>
-      {/* 遮罩層：當選單打開時背景變暗，點擊背景可關閉 */}
+      {/* 遮罩層 */}
       <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        className={`fixed inset-0 bg-black/10 backdrop-blur-[1px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose} 
       />
 
-      {/* 側邊欄主體：寬度 280px，背景色採用精準的暖灰色 */}
+      {/* 側邊欄主體 */}
       <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] border-r border-[#E2DDD9] z-[110] transition-transform duration-500 ease-in-out transform 
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl shadow-black/5`}>
         
         <div className="p-8 flex flex-col h-full">
           
           {/* 標題與關閉按鈕 */}
-          <div className="flex justify-between items-start mb-6">
-            <h2 className="text-[24px] font-bold text-[#5E5045] tracking-tight font-serif">分類導覽</h2>
-            <button onClick={onClose} className="p-1 text-[#5E5045] opacity-60 hover:opacity-100 transition-opacity">
-              <X size={26} strokeWidth={1.2} />
+          <div className="flex justify-between items-start mb-2">
+            <h2 className="text-[26px] font-bold text-[#5E5045] tracking-tight font-serif">分類導覽</h2>
+            <button onClick={onClose} className="p-1 text-[#5E5045] opacity-50 hover:opacity-100 transition-opacity">
+              <X size={28} strokeWidth={1.2} />
             </button>
           </div>
 
-          {/* 副標題 */}
-          <div className="mb-10 text-[13px] text-[#A8A29E] font-medium leading-relaxed">
+          {/* 副標題：灰色、小字、兩行緊貼 */}
+          <div className="mb-10 text-[13px] text-[#A8A29E] font-medium leading-[1.4]">
             <p>圖書登記清單</p>
             <p>百合花開的世界</p>
           </div>
@@ -61,9 +58,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
                 <button 
                   key={item.id} 
                   onClick={() => { onSelectCategory(item.id as any); onClose(); }}
-                  className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-300
+                  className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-[20px] transition-all duration-300
                     ${isSelected 
-                      ? 'bg-[#8C7B6D] text-white shadow-lg shadow-black/10' 
+                      ? 'bg-[#8C7B6D] text-white shadow-lg shadow-black/5' 
                       : 'text-[#5E5045] hover:bg-white/40'
                     }`}
                 >
@@ -72,30 +69,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
                     strokeWidth={isSelected ? 2 : 1.2}
                     className={isSelected ? 'text-white' : 'text-[#5E5045]'} 
                   /> 
-                  <span className={`text-[16px] tracking-wide ${isSelected ? 'font-bold' : 'font-medium'}`}>
+                  <span className={`text-[16px] tracking-wide ${isSelected ? 'font-bold' : 'font-medium opacity-90'}`}>
                     {item.label}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-
-     {/* 底部按鈕：精確還原右圖樣式 */}
-<div className="pt-6 border-t border-[#E2DDD9]">
-  <button 
-    onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
-    className={`w-full flex items-center justify-center gap-2.5 p-3.5 rounded-[22px] border transition-all duration-300
-    ${selectedCategory === Category.GAY 
-      ? 'bg-[#5E5045] text-white border-transparent' 
-      : 'bg-[#EAE4DD] border-[#DED8D1] text-[#8C7B6D] hover:bg-[#E2DDD9]'
-    }`}
-  >
-    {/* 只有一個線條星星，不要 Emoji */}
-    <Sparkles 
-      size={18} 
-      strokeWidth={1.5}
-      className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D]'} 
-    />
-    <span className="text-[15px] font-medium tracking-tight">甲片 ver.</span>
-  </button>
-</div>
+                  </s
