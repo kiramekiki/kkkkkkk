@@ -11,12 +11,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, onSelectCategory }) => {
   const menuItems = [
-    { id: 'ALL', label: '全部收藏', icon: LayoutGrid },
+    { id: 'ALL', label: '全部', icon: LayoutGrid },
     { id: Category.MANGA, label: '漫畫', icon: BookOpen },
     { id: Category.NOVEL, label: '小說', icon: Book },
     { id: Category.MOVIE, label: '電影', icon: Film },
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
-    { id: 'OTHER', label: '其他', icon: MoreHorizontal }, // 對應圖片中的「其他」
+    { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
+    { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
   ];
 
   return (
