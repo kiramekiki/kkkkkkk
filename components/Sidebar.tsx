@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
                 className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D]'} 
                 strokeWidth={2}
               />
-              <span className="text-[15px] font-bold tracking-wider">✨ 甲片 ver.</span>
+              <span className="text-[15px] font-bold tracking-wider"> 甲片 ver.</span>
             </button>
           </div>
         </div>
