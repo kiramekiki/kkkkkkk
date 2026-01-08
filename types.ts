@@ -47,12 +47,13 @@ export const CATEGORY_STYLES: Record<string, string> = {
   DEFAULT: 'text-stone-400 border-stone-200'
 };
 
+// types.ts 中的對照表
 export const CATEGORY_DISPLAY_MAP: Record<string, string> = {
-  [Category.MANGA]: 'Manga / Novel',
-  [Category.NOVEL]: 'Manga / Novel',
-  [Category.MOVIE]: 'Anime / Movie',
-  [Category.ANIMATION]: 'Anime / Movie',
-  [Category.GAME]: 'Game',
-  [Category.DRAMA_SERIES]: 'Drama',
-  [Category.GAY]: 'Gay ver.'
+  [Category.MANGA]: 'MANGA',
+  [Category.NOVEL]: 'NOVEL',
+  [Category.MOVIE]: 'MOVIE',
+  [Category.ANIMATION]: 'ANIME',
+  [Category.GAME]: 'GAME',
+  [Category.DRAMA_SERIES]: 'DRAMA',
+  [Category.GAY]: 'GAY'
 };
