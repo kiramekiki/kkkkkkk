@@ -23,7 +23,6 @@ export default async function handler(req, res) {
     coverUrl: data.coverUrl,
     plurkUrl: data.plurkUrl,
     tags: data.tags || [],
-    library_type: data.library_type
   };
 
   // 3. 執行寫入
