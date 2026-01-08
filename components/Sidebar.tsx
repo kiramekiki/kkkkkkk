@@ -1,5 +1,8 @@
 import React from 'react';
-import { X, LayoutGrid, BookOpen, Book, Film, Tv, MoreHorizontal, Heart } from 'lucide-react';
+import { 
+  X, LayoutGrid, BookOpen, Book, Film, Tv, 
+  Gamepad2, Clapperboard, Sparkles 
+} from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -10,8 +13,9 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, onSelectCategory }) => {
+  // 這裡是你指定的分類導覽清單
   const menuItems = [
-    { id: 'ALL', label: '全部', icon: LayoutGrid },
+    { id: 'ALL', label: '全部收藏', icon: LayoutGrid },
     { id: Category.MANGA, label: '漫畫', icon: BookOpen },
     { id: Category.NOVEL, label: '小說', icon: Book },
     { id: Category.MOVIE, label: '電影', icon: Film },
@@ -22,13 +26,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
 
   return (
     <>
-      {/* 遮罩層 */}
+      {/* 遮罩層：當選單打開時背景變暗，點擊背景可關閉 */}
       <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-[1px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        className={`fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose} 
       />
 
-      {/* 側邊欄主體：背景改為更精準的暖灰色 */}
+      {/* 側邊欄主體：寬度 280px，背景色採用精準的暖灰色 */}
       <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] border-r border-[#E2DDD9] z-[110] transition-transform duration-500 ease-in-out transform 
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl shadow-black/5`}>
         
@@ -36,13 +40,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
           
           {/* 標題與關閉按鈕 */}
           <div className="flex justify-between items-start mb-6">
-            <h2 className="text-[24px] font-bold text-[#5E5045] tracking-tight">分類導覽</h2>
+            <h2 className="text-[24px] font-bold text-[#5E5045] tracking-tight font-serif">分類導覽</h2>
             <button onClick={onClose} className="p-1 text-[#5E5045] opacity-60 hover:opacity-100 transition-opacity">
               <X size={26} strokeWidth={1.2} />
             </button>
           </div>
 
-          {/* 副標題：緊貼標題，顏色微調 */}
+          {/* 副標題 */}
           <div className="mb-10 text-[13px] text-[#A8A29E] font-medium leading-relaxed">
             <p>圖書登記清單</p>
             <p>百合花開的世界</p>
@@ -76,22 +80,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* 底部按鈕：對應右圖的淺色橢圓風格 */}
+          {/* 底部按鈕：專屬甲片 ver. */}
           <div className="pt-6 border-t border-[#E2DDD9]">
             <button 
               onClick={() => { onSelectCategory(Category.GAY); onClose(); }}
-              className={`w-full flex items-center justify-center gap-2 p-4 rounded-[20px] border transition-all duration-300
+              className={`w-full flex items-center justify-center gap-2.5 p-4 rounded-[20px] border transition-all duration-300
               ${selectedCategory === Category.GAY 
                 ? 'bg-[#5E5045] text-white border-transparent' 
-                : 'bg-[#EAE4DD] border-[#DED8D1] text-[#8C7B6D] hover:bg-[#E2DDD9]'
+                : 'bg-[#EAE4DD] border-[#DED8D1] text-[#8C7B6D] hover:bg-[#EADDD5]'
               }`}
             >
-              <Heart 
+              <Sparkles 
                 size={18} 
-                className={selectedCategory === Category.GAY ? 'fill-white' : 'text-[#8C7B6D]'} 
+                className={selectedCategory === Category.GAY ? 'text-white' : 'text-[#8C7B6D]'} 
                 strokeWidth={2}
               />
-              <span className="text-[15px] font-bold tracking-wider">甲片 ver.</span>
+              <span className="text-[15px] font-bold tracking-wider">✨ 甲片 ver.</span>
             </button>
           </div>
         </div>
