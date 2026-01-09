@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Info } from 'lucide-react'; // 1. 這裡新增了 Info
+import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Info } from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -18,25 +18,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
     { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
     { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
-    { id: Category.OTHER, label: '其他', icon: Info }, // 2. 這裡新增了「其他」分類
+    { id: Category.OTHER, label: '其他', icon: Info }, // 已新增其他分類
   ];
 
   return (
     <>
-      {/* 遮罩 */}
+      {/* 遮罩：點擊側邊欄以外區域會關閉 */}
       <div 
         className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
         onClick={onClose} 
       />
 
-      {/* 側邊欄 */}
-      {/* 注意：我移除了 lg:static 和 lg:translate-x-0，確保側邊欄只有在點擊時才出現，不會固定在左側 */}
-      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] z-[110] transition-transform duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* 側邊欄：已移除 lg:static，確保它是純粹的抽屜式按鈕側欄 */}
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] z-[110] shadow-2xl transition-transform duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-8 flex flex-col h-full text-[#5E5045]">
           
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-serif font-bold tracking-tight">分類導覽</h2>
-            <button onClick={onClose} className="p-1"><X size={24} /></button>
+            {/* 關閉按鈕 */}
+            <button onClick={onClose} className="p-1 hover:bg-white/50 rounded-full transition-colors"><X size={24} /></button>
           </div>
 
           <div className="mb-10 text-[13px] text-[#A8A29E] font-medium tracking-tight text-left">
