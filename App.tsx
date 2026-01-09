@@ -129,21 +129,17 @@ const App: React.FC = () => {
           <div className="max-w-6xl mx-auto w-full">
             
             {/* 標題與排版 (完全依照圖一復原) */}
-            <section className="text-center mb-10 mt-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100/50 dark:bg-stone-800/50 text-[9px] tracking-[0.25em] text-stone-400 font-bold uppercase mb-6">
-                <Heart size={10} className="text-rose-300 fill-rose-300" />
+            <section className="text-center mb-16 mt-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[9px] tracking-500 text-stone-400 font-bold uppercase mb-6">
+                <Heart size={10} className="text-rose-400 fill-rose-400" />
                 Lily Garden Library
               </div>
-              <h1 className="text-3xl md:text-4xl font-serif font-medium text-stone-700 dark:text-stone-100 mb-4 tracking-[0.15em]">
-                百合圖書與電影
-              </h1>
-              <p className="text-sm md:text-base text-stone-400 italic font-serif tracking-widest opacity-80 mb-10">
-                天から落ちて来る星の破片を墓標に置いて下さい
-              </p>
+              <h1 className="text-4xl md:text-5xl font-serif font-medium text-eart-800 dark:text-stone-100 mb-4 tracking-tight">百合圖書與電影</h1>
+              <p className="text-lg text-earth-500 dark:text-stone-400 italic font-serif mb-8">天から落ちて来る星的破片を墓標に置いて下さい</p>
               
               {/* 使用指南方塊 */}
               <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
-                <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🚀</div>
+                <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🗡️</div>
                 <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
                   <span><b>聖經</b>：某種神的旨意</span>
