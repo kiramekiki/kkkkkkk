@@ -10,7 +10,6 @@ const PlurkPIcon = ({ size = 20, className = "" }: { size?: number, className?: 
   </svg>
 );
 
-// 更新排序類型，加入等級排序
 type SortOption = 'date-desc' | 'date-asc' | 'rating-desc' | 'rating-asc';
 
 const App: React.FC = () => {
@@ -66,14 +65,6 @@ const App: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const stats = useMemo(() => ({
-    total: entries.length,
-    manga: entries.filter(e => e.category === Category.MANGA).length,
-    novel: entries.filter(e => e.category === Category.NOVEL).length,
-    movie: entries.filter(e => e.category === Category.MOVIE).length
-  }), [entries]);
-
-  // 排序邏輯優化：加入等級權重排序
   const processedEntries = useMemo(() => {
     let result = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
@@ -92,18 +83,6 @@ const App: React.FC = () => {
     return result;
   }, [entries, selectedCategory, selectedRating, searchTerm, sortBy]);
 
-  const handleEdit = (entry: Entry) => { setEditingEntry(entry); setIsModalOpen(true); };
-
-  const handleDelete = async (entryId: string) => {
-    const password = prompt('請輸入管理員密碼：');
-    if (!password) return;
-    if (!confirm('確定刪除嗎？')) return;
-    try {
-      const response = await fetch('/api/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: entryId, password }) });
-      if (response.ok) { fetchEntries(); setExpandedEntry(null); }
-    } catch (err) { alert('失敗'); }
-  };
-
   const categoriesList = [
     { id: 'ALL', label: '全部', icon: LayoutGrid },
     { id: Category.MANGA, label: '漫畫', icon: BookOpen },
@@ -112,7 +91,6 @@ const App: React.FC = () => {
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
     { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
     { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
-    { id: Category.OTHER, label: '其他', icon: Info },
   ];
 
   const ratingOptions = [
@@ -124,12 +102,11 @@ const App: React.FC = () => {
     { id: Rating.MYSTERIOUS, label: '神秘', emoji: '🔮' },
   ];
 
-  // 更新排序選項清單
   const sortOptions = [
     { id: 'date-desc', label: '由新到舊' },
     { id: 'date-asc', label: '由舊到新' },
-    { id: 'rating-desc', label: '由高到低)' },
-    { id: 'rating-asc', label: '由低到高)' },
+    { id: 'rating-desc', label: '由高到低' },
+    { id: 'rating-asc', label: '由低到高' },
   ];
 
   return (
@@ -145,59 +122,52 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 custom-scrollbar">
           <div className="max-w-6xl mx-auto w-full">
             
-            <section className="text-center mb-16 mt-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] tracking-widest text-stone-500 font-bold uppercase mb-6">
-                <Heart size={10} className="text-rose-400 fill-rose-400" />Lily Garden Library
+            {/* 1. 標題排版復原 (比照圖一) */}
+            <section className="text-center mb-10 mt-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100/50 dark:bg-stone-800/50 text-[9px] tracking-[0.25em] text-stone-400 font-bold uppercase mb-4">
+                <Heart size={10} className="text-rose-300 fill-rose-300" />
+                Lily Garden Library
               </div>
-              <h1 className="text-[42px] md:text-[52px] font-serif font-medium text-stone-800 dark:text-stone-100 mb-6 tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-4xl font-serif font-medium text-stone-700 dark:text-stone-100 mb-3 tracking-[0.15em]">
                 百合圖書與電影
               </h1>
-              <p className="text-[18px] md:text-[22px] text-stone-500 italic font-serif leading-relaxed">
+              <p className="text-sm md:text-base text-stone-400 italic font-serif tracking-widest opacity-80">
                 天から落ちて来る星的破片を墓標に置いて下さい
               </p>
-              
-              <div className="max-w-3xl mx-auto mt-12 bg-stone-100/50 dark:bg-stone-800/50 p-6 rounded-xl border border-stone-200 dark:border-stone-700 text-sm">
-                <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南🗡️</div>
-                <p className="text-stone-500 mb-4 text-center">純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] border-t border-stone-200 pt-4">
-                  <span><b>聖經</b>：某種神的旨意</span><span><b>極品</b>：印象深刻且強勁或全方位優質</span><span><b>頂級</b>：難能可貴</span><span><b>普通</b>：普通</span><span><b>神秘</b>：沒有緣分</span>
-                </div>
-              </div>
             </section>
 
-            {/* --- Toolbar: 修正選中按鈕在深色模式下的樣式 --- */}
-            <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-6 mb-8 border-b border-stone-200 dark:border-stone-800">
-              <div className="flex flex-nowrap items-center gap-2 overflow-x-auto hide-scrollbar min-w-full">
-                <div className="flex flex-nowrap items-center gap-1">
-                  {categoriesList.map(cat => {
-                    const isSelected = selectedCategory === cat.id;
-                    return (
-                      <button 
-                        key={cat.id} 
-                        onClick={() => setSelectedCategory(cat.id as any)} 
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm whitespace-nowrap transition-all border 
-                          ${isSelected 
-                            ? 'bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-800 dark:text-stone-100 shadow-sm font-medium' 
-                            : 'border-transparent text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800'
-                          }`}
-                      >
-                        <cat.icon size={16} /> <span>{cat.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="h-6 w-px bg-stone-300 dark:bg-stone-700 mx-2 flex-shrink-0"></div>
+            {/* 2. 搜尋吧恢復原狀 (比照圖三，移除滑軌，同一列) */}
+            <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-4 mb-8 border-b border-stone-200/60">
+              <div className="flex items-center gap-x-2 w-full overflow-visible">
                 
+                {/* 分類按鈕組 */}
+                <div className="flex items-center gap-x-1">
+                  {categoriesList.map(cat => (
+                    <button 
+                      key={cat.id} 
+                      onClick={() => setSelectedCategory(cat.id as any)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm whitespace-nowrap transition-all border 
+                        ${selectedCategory === cat.id ? 'bg-white border-stone-300 text-stone-800 shadow-sm' : 'border-transparent text-stone-500 hover:bg-stone-100'}`}
+                    >
+                      <cat.icon size={15} /> <span>{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* 分隔線 */}
+                <div className="h-6 w-px bg-stone-200 mx-2 flex-shrink-0" />
+
+                {/* 等級下拉 */}
                 <div className="relative flex-shrink-0" ref={ratingDropdownRef}>
-                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-2 px-3 py-1.5 border border-stone-200 rounded-md text-sm text-stone-700 bg-white whitespace-nowrap">
-                    <span>{ratingOptions.find(o => o.id === selectedRating)?.label || '所有等級'}</span>
+                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800">
+                    <span>{ratingOptions.find(o => o.id === selectedRating)?.label}</span>
                     <ChevronDown size={14} />
                   </button>
                   {isRatingDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-44 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
+                    <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {ratingOptions.map(o => (
                         <button key={o.id} onClick={() => { setSelectedRating(o.id as any); setIsRatingDropdownOpen(false); }} 
-                          className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${selectedRating === o.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-stone-50'}`}>
+                          className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 ${selectedRating === o.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-stone-50 text-stone-600'}`}>
                           <span className="text-base">{o.emoji}</span><span>{o.label}</span>
                         </button>
                       ))}
@@ -205,30 +175,43 @@ const App: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex-1 min-w-[200px] relative flex-shrink-0">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
-                  <input type="text" placeholder="搜尋..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded text-sm outline-none" />
+                {/* 搜尋框 */}
+                <div className="flex-1 relative min-w-[120px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-300" size={16} />
+                  <input 
+                    type="text" placeholder="搜尋..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+                    className="w-full pl-9 pr-4 py-2 bg-white dark:bg-stone-800 border border-stone-200/60 rounded-md text-sm outline-none focus:border-stone-400 transition-all" 
+                  />
                 </div>
-                
-                <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#5e5045] text-white rounded text-sm font-bold shadow-sm hover:bg-[#4a403a] flex-shrink-0 whitespace-nowrap">
+
+                {/* 新增按鈕 */}
+                <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#5e5045] text-white rounded-md text-sm font-bold shadow-sm hover:bg-[#4a403a] flex-shrink-0">
                   <Plus size={18} /><span>新增</span>
                 </button>
-                
+
+                {/* 3. 排序按鈕 (比照圖二，修復邏輯) */}
                 <div className="relative flex-shrink-0" ref={sortDropdownRef}>
-                  <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="flex items-center gap-2 px-3 py-2 bg-white border border-stone-800 text-stone-800 rounded text-sm font-medium whitespace-nowrap">
-                    <ArrowUpDown size={14} /><span>{sortOptions.find(o => o.id === sortBy)?.label}</span>
+                  <button 
+                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} 
+                    className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm transition-colors"
+                  >
+                    <ArrowUpDown size={15} />
+                    <span className="font-medium">{sortOptions.find(o => o.id === sortBy)?.label}</span>
+                    <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180 transition-transform' : ''} />
                   </button>
                   {isSortDropdownOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-56 bg-white border border-stone-200 shadow-xl rounded-md z-50">
+                    <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {sortOptions.map(o => (
-                        <button key={o.id} onClick={() => { setSortBy(o.id as any); setIsSortDropdownOpen(false); }} className="w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:bg-stone-50 text-stone-700">
+                        <button key={o.id} onClick={() => { setSortBy(o.id as any); setIsSortDropdownOpen(false); }} 
+                          className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center ${sortBy === o.id ? 'bg-stone-50 text-stone-900 font-bold' : 'text-stone-500 hover:bg-stone-50'}`}>
                           <span>{o.label}</span>
-                          {sortBy === o.id && <Check size={14} className="text-blue-500" />}
+                          {sortBy === o.id && <Check size={14} className="text-stone-400" />}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
 
@@ -256,34 +239,32 @@ const App: React.FC = () => {
             {/* Footer */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
-                <div className="relative z-10"><h3 className="text-3xl font-serif font-medium mb-4">撒下的百合花</h3><p className="text-sm opacity-80 mb-10 text-stone-100">儘量記錄看過的作品，留存當下的情緒</p>
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-serif font-medium mb-4">撒下的百合花</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                    {[ { v: stats.total, l: '總收藏' }, { v: stats.manga, l: '漫畫' }, { v: stats.novel, l: '小說' }, { v: stats.movie, l: '電影' } ].map(s => (
+                    {[{ v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' }].map(s => (
                       <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm"><div className="text-4xl font-bold font-sans mb-1 leading-none">{s.v}</div><div className="text-[11px] uppercase tracking-widest opacity-70">{s.l}</div></div>
                     ))}
                   </div>
                 </div>
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
               </div>
             </footer>
           </div>
         </main>
       </div>
 
-      <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
+      <AddEntryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onRefresh={fetchEntries} entry={editingEntry} />
       
-      {/* 展開視圖 (大卡片) */}
+      {/* 展開視圖 (分類改英文) */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => setExpandedEntry(null)} />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
           <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
-             
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
                 <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
              </div>
-
-             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
                 <div>
                   <div className="flex gap-3 mb-8">
                     <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
@@ -293,41 +274,22 @@ const App: React.FC = () => {
                       {expandedEntry.rating}
                     </span>
                   </div>
-
-                  <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 leading-tight">
-                    {expandedEntry.title}
-                  </h2>
-                  <p className="text-xl text-stone-400 italic font-serif mb-12">
-                    by <span className="text-stone-500">{expandedEntry.author}</span>
-                  </p>
-
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight">{expandedEntry.title}</h2>
+                  <p className="text-xl text-stone-400 italic font-serif mb-12">by <span className="text-stone-500">{expandedEntry.author}</span></p>
                   {expandedEntry.note && (
-                    <div className="relative pl-10 mb-12">
-                      <span className="absolute left-0 top-[-10px] text-5xl text-stone-200 font-serif select-none">“</span>
-                      <div className="border-l-[1px] border-stone-200 pl-6">
-                        <p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed">
-                          {expandedEntry.note}
-                        </p>
-                      </div>
+                    <div className="relative pl-10 mb-12 border-l border-stone-200">
+                      <p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed">"{expandedEntry.note}"</p>
                     </div>
                   )}
                 </div>
-
                 <div className="flex items-center justify-between pt-8 border-t border-stone-100">
                   <div className="flex flex-wrap gap-2">
-                    {expandedEntry.tags?.map(t => (
-                      <span key={t} className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded text-[10px] text-stone-500 font-bold">#{t}</span>
-                    ))}
+                    {expandedEntry.tags?.map(t => <span key={t} className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded text-[10px] text-stone-500 font-bold">#{t}</span>)}
                   </div>
                   <div className="flex items-center gap-5 text-stone-300">
-                    {expandedEntry.plurkUrl && (
-                      <a href={expandedEntry.plurkUrl} target="_blank" rel="noopener noreferrer" className="hover:text-stone-800 transition-colors">
-                        <PlurkPIcon size={20} />
-                      </a>
-                    )}
-                    <div className="h-5 w-[1px] bg-stone-100" />
-                    <button onClick={() => handleEdit(expandedEntry)} className="hover:text-stone-800 transition-colors"><Edit2 size={20} /></button>
-                    <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors"><Trash2 size={20} /></button>
+                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
+                    <button onClick={() => handleEdit(expandedEntry)} className="hover:text-stone-800 transition-colors"><Edit2 size={16} /></button>
+                    <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
                   </div>
                 </div>
              </div>
