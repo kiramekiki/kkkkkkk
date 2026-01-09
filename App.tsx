@@ -18,7 +18,7 @@ const PlurkPIcon = ({ size = 20, className = "" }: { size?: number, className?: 
 type SortOption = 'date-desc' | 'date-asc' | 'rating-desc' | 'rating-asc';
 
 const App: React.FC = () => {
-  // --- 邏輯部分 ---
+  // --- 狀態管理 ---
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return window.localStorage.getItem('theme') === 'dark' ||
@@ -37,12 +37,11 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [expandedEntry, setExpandedEntry] = useState<Entry | null>(null);
-  const [isRatingDropdownOpen, setIsRatingDropdownOpen] = useState(false);
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   
   const ratingDropdownRef = useRef<HTMLDivElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
+  // --- 資料獲取 ---
   const fetchEntries = async () => {
     setIsLoading(true);
     try {
@@ -62,6 +61,7 @@ const App: React.FC = () => {
     else { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); }
   }, [isDarkMode]);
 
+  // --- 統計數據邏輯 ---
   const stats = useMemo(() => ({
     total: entries.length,
     manga: entries.filter(e => e.category === Category.MANGA).length,
@@ -73,9 +73,7 @@ const App: React.FC = () => {
     let result = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
-      const matchesSearch = 
-        entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        entry.author.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || entry.author.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesRating && matchesSearch;
     });
     result.sort((a, b) => {
@@ -97,18 +95,23 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="flex min-h-screen w-full bg-earth-50 dark:bg-[#191919] transition-colors duration-300 font-sans">
+    <div className="flex min-h-screen w-full bg-earth-50 dark:bg-[#191919] transition-colors duration-300 font-sans overflow-x-hidden">
       
-      {/* 側邊欄：恢復為 Drawer (滑出式) */}
+      {/* 1. 按鈕式側邊欄 (Sidebar) - 恢復為 Drawer 模式 */}
       <Sidebar 
-        isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} 
-        selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory}
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        selectedCategory={selectedCategory} 
+        onSelectCategory={setSelectedCategory}
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* Top Header Buttons */}
+        {/* Header 按鈕 */}
         <div className="flex justify-between items-center px-6 py-4 z-20">
-            <button onClick={() => setSidebarOpen(true)} className="p-2 text-earth-600 dark:text-earth-300 hover:bg-earth-200 dark:hover:bg-stone-800 rounded-lg transition-all">
+            <button 
+              onClick={() => setSidebarOpen(true)} 
+              className="p-2 text-earth-600 dark:text-earth-300 hover:bg-earth-200 dark:hover:bg-stone-800 rounded-lg transition-all"
+            >
               <Menu size={20} />
             </button>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full hover:bg-earth-200 dark:hover:bg-stone-800 text-earth-600 dark:text-earth-300 transition-colors">
@@ -119,7 +122,7 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 custom-scrollbar">
           <div className="max-w-6xl mx-auto w-full">
             
-            {/* 標題與標籤 */}
+            {/* 標題與使用指南 */}
             <section className="text-center mb-16 mt-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] tracking-widest text-stone-500 font-bold uppercase mb-6">
                 <Heart size={10} className="text-rose-400 fill-rose-400" />
@@ -128,7 +131,6 @@ const App: React.FC = () => {
               <h1 className="text-4xl md:text-5xl font-serif font-medium text-earth-800 dark:text-earth-100 mb-4 tracking-tight">百合圖書與電影</h1>
               <p className="text-lg text-earth-500 dark:text-stone-400 italic font-serif mb-8">天から落ちて来る星的破片を墓標に置いて下さい</p>
               
-              {/* 使用指南方塊 */}
               <div className="max-w-3xl mx-auto bg-stone-100/60 dark:bg-stone-800/50 p-6 rounded-xl border border-stone-200 dark:border-stone-700 text-sm text-earth-600 dark:text-stone-400 leading-relaxed shadow-sm">
                 <div className="flex items-center justify-center gap-2 font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">
                    <span>使用指南🗡️</span>
@@ -144,7 +146,7 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {/* 工具列 (水平排列) */}
+            {/* Toolbar */}
             <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-4 mb-8 border-b border-earth-200 dark:border-stone-800">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-1 overflow-x-auto pb-2 xl:pb-0 hide-scrollbar">
@@ -167,13 +169,13 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* 卡片 Grid */}
+            {/* 卡片 Grid 區域 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {processedEntries.map((entry) => (
                 <div key={entry.id} onClick={() => setExpandedEntry(entry)}
                   className="flex bg-white dark:bg-[#202020] rounded-lg overflow-hidden border border-stone-100 dark:border-stone-800 shadow-soft hover:shadow-md transition-all cursor-pointer group h-48 relative"
                 >
-                  <div className="w-32 bg-stone-100 flex-shrink-0">
+                  <div className="w-32 bg-stone-100 flex-shrink-0 relative">
                      <img src={entry.coverUrl} alt={entry.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
                   </div>
                   <div className="flex-1 p-5 flex flex-col justify-between">
@@ -191,19 +193,20 @@ const App: React.FC = () => {
                     </div>
                   </div>
                   {entry.plurkUrl && (
-                    <div className="absolute bottom-2 right-2 text-stone-300"><PlurkPIcon size={16} /></div>
+                    <div className="absolute bottom-2 right-2 text-stone-300 opacity-50"><PlurkPIcon size={16} /></div>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* 復原頁尾統計：深褐色背景、透明方塊 */}
+            {/* 2. 頁尾統計區域 - 修正數字字體與佈局 */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
-                  <h3 className="text-3xl font-serif font-medium mb-4">撒下的百合花</h3>
-                  <p className="text-sm opacity-80 mb-10">儘量記錄看過的作品，留存當下的情緒</p>
+                  <h3 className="text-3xl font-serif font-medium mb-4 text-white">撒下的百合花</h3>
+                  <p className="text-sm opacity-80 mb-10 text-stone-100">儘量記錄看過的作品，留存當下的情緒</p>
                   
+                  {/* 統計方塊：精確復原字體樣式 */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                     {[
                       { v: stats.total, l: '總收藏' },
@@ -211,39 +214,44 @@ const App: React.FC = () => {
                       { v: stats.novel, l: '小說' },
                       { v: stats.movie, l: '電影' }
                     ].map(s => (
-                      <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm">
-                        <div className="text-4xl font-bold mb-1">{s.v}</div>
-                        <div className="text-[11px] uppercase tracking-widest opacity-70">{s.l}</div>
+                      <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center h-32">
+                        {/* 數字：使用粗體 Sans 字體，確保字形正確 */}
+                        <div className="text-4xl font-bold font-sans text-white mb-1 leading-none">{s.v}</div>
+                        <div className="text-[11px] font-medium uppercase tracking-widest text-white/70">{s.l}</div>
                       </div>
                     ))}
                   </div>
                 </div>
                 {/* 裝飾背景 */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-black/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
               </div>
             </footer>
           </div>
         </main>
       </div>
 
-      {/* 展開模態框與新增模態框 */}
       <AddEntryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onRefresh={fetchEntries} entry={editingEntry} />
+      
+      {/* 展開作品視窗 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setExpandedEntry(null)} />
-          <div className="relative bg-white dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[900px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setExpandedEntry(null)} />
+          <div className="relative bg-white dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[900px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95">
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md"><X size={20} /></button>
              <div className="md:w-1/2 bg-stone-100"><img src={expandedEntry.coverUrl} className="w-full h-full object-cover" /></div>
-             <div className="flex-1 p-8 md:p-12 overflow-y-auto">
-                <h2 className="text-4xl font-serif font-bold mb-2">{expandedEntry.title}</h2>
-                <p className="text-xl text-stone-500 italic mb-8">by {expandedEntry.author}</p>
-                <div className="text-lg text-stone-600 dark:text-stone-400 italic mb-10 border-l-4 border-stone-200 pl-6">"{expandedEntry.note}"</div>
+             <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar">
+                <h2 className="text-4xl font-serif font-bold mb-2 text-stone-800 dark:text-stone-100">{expandedEntry.title}</h2>
+                <p className="text-xl text-stone-500 italic mb-8 font-serif">by {expandedEntry.author}</p>
+                <div className="text-lg text-stone-600 dark:text-stone-400 italic mb-10 border-l-4 border-stone-200 pl-6 font-serif">"{expandedEntry.note}"</div>
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {expandedEntry.tags?.map(t => <span key={t} className="px-4 py-1.5 bg-stone-100 dark:bg-stone-800 rounded-full text-xs">#{t}</span>)}
+                  {expandedEntry.tags?.map(t => <span key={t} className="px-4 py-1.5 bg-stone-100 dark:bg-stone-800 rounded-full text-xs text-stone-500 font-bold">#{t}</span>)}
                 </div>
                 <div className="flex gap-4">
-                  <button onClick={() => handleEdit(expandedEntry)} className="px-6 py-2 bg-stone-100 dark:bg-stone-800 rounded-xl text-sm font-bold flex items-center gap-2"><Edit2 size={16}/> 編輯</button>
-                  <button onClick={() => handleDelete(expandedEntry.id)} className="px-6 py-2 bg-rose-50 text-rose-500 rounded-xl text-sm font-bold flex items-center gap-2"><Trash2 size={16}/> 刪除</button>
+                   {expandedEntry.plurkUrl && (
+                     <a href={expandedEntry.plurkUrl} target="_blank" className="p-3 bg-stone-800 text-white rounded-xl hover:bg-black"><PlurkPIcon size={20}/></a>
+                   )}
+                   <button onClick={() => setExpandedEntry(null)} className="flex-1 py-3 border border-stone-200 rounded-xl font-bold text-stone-500">返回</button>
                 </div>
              </div>
           </div>
