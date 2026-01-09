@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard } from 'lucide-react';
+import { X, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Clapperboard, Info } from 'lucide-react'; // 1. 這裡新增了 Info
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -18,6 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
     { id: Category.ANIMATION, label: '動畫', icon: Tv },
     { id: Category.GAME, label: '遊戲', icon: Gamepad2 },
     { id: Category.DRAMA_SERIES, label: '劇集', icon: Clapperboard },
+    { id: Category.OTHER, label: '其他', icon: Info }, // 2. 這裡新增了「其他」分類
   ];
 
   return (
@@ -29,12 +30,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
       />
 
       {/* 側邊欄 */}
-      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] z-[110] transition-transform duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:translate-x-0`}>
+      {/* 注意：我移除了 lg:static 和 lg:translate-x-0，確保側邊欄只有在點擊時才出現，不會固定在左側 */}
+      <aside className={`fixed inset-y-0 left-0 w-[280px] bg-[#F2EEE9] z-[110] transition-transform duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-8 flex flex-col h-full text-[#5E5045]">
           
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-serif font-bold tracking-tight">分類導覽</h2>
-            <button onClick={onClose} className="lg:hidden p-1"><X size={24} /></button>
+            <button onClick={onClose} className="p-1"><X size={24} /></button>
           </div>
 
           <div className="mb-10 text-[13px] text-[#A8A29E] font-medium tracking-tight text-left">
@@ -61,7 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* 底部按鈕已移除 */}
           <div className="mt-auto pt-6 text-center">
             <p className="text-[10px] text-[#A8A29E] opacity-50 font-serif italic">Lily Library © 2026</p>
           </div>
