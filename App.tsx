@@ -130,8 +130,8 @@ const App: React.FC = () => {
             
             {/* 標題與排版 (完全依照圖一復原) */}
             <section className="text-center mb-16 mt-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[9px] tracking-500 text-stone-400 font-bold uppercase mb-6">
-                <Heart size={10} className="text-rose-400 fill-rose-400" />
+               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] tracking-widest text-stone-500 dark:text-stone-400 font-bold uppercase mb-6">
+               <Heart size={10} className="text-rose-400 fill-rose-400" />
                 Lily Garden Library
               </div>
               <h1 className="text-4xl md:text-5xl font-serif font-medium text-eart-800 dark:text-stone-100 mb-4 tracking-tight">百合圖書與電影</h1>
@@ -178,16 +178,16 @@ const App: React.FC = () => {
 
                 <div className="h-6 w-px bg-stone-200 mx-2 flex-shrink-0" />
 
-                {/* 等級下拉 */}
+                 {/* 等級下拉 (修復功能) */}
                 <div className="relative flex-shrink-0" ref={ratingDropdownRef}>
-                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800 whitespace-nowrap">
+                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800">
                     <span>{ratingOptions.find(o => o.id === selectedRating)?.label}</span>
-                    <ChevronDown size={14} />
+                    <ChevronDown size={14} className={isRatingDropdownOpen ? 'rotate-180' : ''} />
                   </button>
                   {isRatingDropdownOpen && (
                     <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {ratingOptions.map(o => (
-                        <button key={o.id} onClick={() => { setSelectedRating(o.id as any); setIsRatingDropdownOpen(false); }} 
+                        <button key={o.id} onMouseDown={(e) => { e.preventDefault(); setSelectedRating(o.id as any); setIsRatingDropdownOpen(false); }} 
                           className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 ${selectedRating === o.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-stone-50 text-stone-600'}`}>
                           <span className="text-base">{o.emoji}</span><span>{o.label}</span>
                         </button>
@@ -207,17 +207,17 @@ const App: React.FC = () => {
                   <Plus size={18} /><span>新增</span>
                 </button>
 
-                {/* 排序按鈕 */}
+               {/* 排序按鈕 (比照圖二，修復功能) */}
                 <div className="relative flex-shrink-0" ref={sortDropdownRef}>
-                  <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm whitespace-nowrap transition-colors">
+                  <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm">
                     <ArrowUpDown size={15} />
                     <span className="font-medium">{sortOptions.find(o => o.id === sortBy)?.label}</span>
-                    <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180 transition-transform' : ''} />
+                    <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180' : ''} />
                   </button>
                   {isSortDropdownOpen && (
                     <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {sortOptions.map(o => (
-                        <button key={o.id} onClick={() => { setSortBy(o.id as any); setIsSortDropdownOpen(false); }} 
+                        <button key={o.id} onMouseDown={(e) => { e.preventDefault(); setSortBy(o.id as any); setIsSortDropdownOpen(false); }} 
                           className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center ${sortBy === o.id ? 'bg-stone-50 text-stone-900 font-bold' : 'text-stone-500 hover:bg-stone-50'}`}>
                           <span>{o.label}</span>
                           {sortBy === o.id && <Check size={14} className="text-stone-400" />}
@@ -229,6 +229,7 @@ const App: React.FC = () => {
 
               </div>
             </div>
+
 
             {/* 卡片區域 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
