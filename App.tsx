@@ -72,7 +72,6 @@ const App: React.FC = () => {
       const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || entry.author.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesRating && matchesSearch;
     });
-
     result.sort((a, b) => {
       if (sortBy === 'date-desc') return (b.createdAt || 0) - (a.createdAt || 0);
       if (sortBy === 'date-asc') return (a.createdAt || 0) - (b.createdAt || 0);
@@ -109,6 +108,13 @@ const App: React.FC = () => {
     { id: 'rating-asc', label: '由低到高' },
   ];
 
+  const stats = useMemo(() => ({
+    total: entries.length,
+    manga: entries.filter(e => e.category === Category.MANGA).length,
+    novel: entries.filter(e => e.category === Category.NOVEL).length,
+    movie: entries.filter(e => e.category === Category.MOVIE).length
+  }), [entries]);
+
   return (
     <div className="flex min-h-screen w-full bg-earth-50 dark:bg-[#191919] transition-colors duration-300 font-sans">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
@@ -122,44 +128,63 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 custom-scrollbar">
           <div className="max-w-6xl mx-auto w-full">
             
-            {/* 1. 標題排版復原 (比照圖一) */}
+            {/* 標題與排版 (完全依照圖一復原) */}
             <section className="text-center mb-10 mt-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100/50 dark:bg-stone-800/50 text-[9px] tracking-[0.25em] text-stone-400 font-bold uppercase mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100/50 dark:bg-stone-800/50 text-[9px] tracking-[0.25em] text-stone-400 font-bold uppercase mb-6">
                 <Heart size={10} className="text-rose-300 fill-rose-300" />
                 Lily Garden Library
               </div>
-              <h1 className="text-3xl md:text-4xl font-serif font-medium text-stone-700 dark:text-stone-100 mb-3 tracking-[0.15em]">
+              <h1 className="text-3xl md:text-4xl font-serif font-medium text-stone-700 dark:text-stone-100 mb-4 tracking-[0.15em]">
                 百合圖書與電影
               </h1>
-              <p className="text-sm md:text-base text-stone-400 italic font-serif tracking-widest opacity-80">
-                天から落ちて来る星的破片を墓標に置いて下さい
+              <p className="text-sm md:text-base text-stone-400 italic font-serif tracking-widest opacity-80 mb-10">
+                天から落ちて来る星の破片を墓標に置いて下さい
               </p>
+              
+              {/* 使用指南方塊 */}
+              <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
+                <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🚀</div>
+                <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
+                  <span><b>聖經</b>：某種神的旨意</span>
+                  <span><b>極品</b>：印象深刻且強勁或全方位優質</span>
+                  <span><b>頂級</b>：難能可貴</span>
+                  <span><b>普通</b>：普通</span>
+                  <span><b>神秘</b>：沒有緣分</span>
+                </div>
+              </div>
             </section>
 
-            {/* 2. 搜尋吧恢復原狀 (比照圖三，移除滑軌，同一列) */}
-            <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-4 mb-8 border-b border-stone-200/60">
-              <div className="flex items-center gap-x-2 w-full overflow-visible">
+            {/* 搜尋吧 (比照圖一，不換行) */}
+            <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-5 mb-8 border-b border-stone-200/60">
+              <div className="flex flex-nowrap items-center gap-2 overflow-x-auto hide-scrollbar">
                 
-                {/* 分類按鈕組 */}
-                <div className="flex items-center gap-x-1">
-                  {categoriesList.map(cat => (
-                    <button 
-                      key={cat.id} 
-                      onClick={() => setSelectedCategory(cat.id as any)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm whitespace-nowrap transition-all border 
-                        ${selectedCategory === cat.id ? 'bg-white border-stone-300 text-stone-800 shadow-sm' : 'border-transparent text-stone-500 hover:bg-stone-100'}`}
-                    >
-                      <cat.icon size={15} /> <span>{cat.label}</span>
-                    </button>
-                  ))}
+                {/* 分類按鈕 (修正選中樣式，比照圖二) */}
+                <div className="flex items-center gap-1">
+                  {categoriesList.map(cat => {
+                    const isSelected = selectedCategory === cat.id;
+                    return (
+                      <button 
+                        key={cat.id} 
+                        onClick={() => setSelectedCategory(cat.id as any)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm whitespace-nowrap transition-all border 
+                          ${isSelected 
+                            ? (isDarkMode 
+                                ? 'bg-stone-800 border-stone-200 text-white shadow-sm font-medium' // 圖二深色選中樣式
+                                : 'bg-white border-stone-300 text-stone-800 shadow-sm font-medium') 
+                            : 'border-transparent text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
+                      >
+                        <cat.icon size={15} /> <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* 分隔線 */}
                 <div className="h-6 w-px bg-stone-200 mx-2 flex-shrink-0" />
 
                 {/* 等級下拉 */}
                 <div className="relative flex-shrink-0" ref={ratingDropdownRef}>
-                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800">
+                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800 whitespace-nowrap">
                     <span>{ratingOptions.find(o => o.id === selectedRating)?.label}</span>
                     <ChevronDown size={14} />
                   </button>
@@ -176,25 +201,19 @@ const App: React.FC = () => {
                 </div>
 
                 {/* 搜尋框 */}
-                <div className="flex-1 relative min-w-[120px]">
+                <div className="flex-1 relative min-w-[150px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-300" size={16} />
-                  <input 
-                    type="text" placeholder="搜尋..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
-                    className="w-full pl-9 pr-4 py-2 bg-white dark:bg-stone-800 border border-stone-200/60 rounded-md text-sm outline-none focus:border-stone-400 transition-all" 
-                  />
+                  <input type="text" placeholder="搜尋..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-white dark:bg-stone-800 border border-stone-200/60 rounded-md text-sm outline-none focus:border-stone-400 transition-all" />
                 </div>
 
                 {/* 新增按鈕 */}
-                <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#5e5045] text-white rounded-md text-sm font-bold shadow-sm hover:bg-[#4a403a] flex-shrink-0">
+                <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#5e5045] text-white rounded-md text-sm font-bold shadow-sm hover:bg-[#4a403a] flex-shrink-0 whitespace-nowrap">
                   <Plus size={18} /><span>新增</span>
                 </button>
 
-                {/* 3. 排序按鈕 (比照圖二，修復邏輯) */}
+                {/* 排序按鈕 */}
                 <div className="relative flex-shrink-0" ref={sortDropdownRef}>
-                  <button 
-                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} 
-                    className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm transition-colors"
-                  >
+                  <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm whitespace-nowrap transition-colors">
                     <ArrowUpDown size={15} />
                     <span className="font-medium">{sortOptions.find(o => o.id === sortBy)?.label}</span>
                     <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180 transition-transform' : ''} />
@@ -242,7 +261,7 @@ const App: React.FC = () => {
                 <div className="relative z-10">
                   <h3 className="text-2xl font-serif font-medium mb-4">撒下的百合花</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                    {[{ v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' }].map(s => (
+                    {[ { v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' } ].map(s => (
                       <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm"><div className="text-4xl font-bold font-sans mb-1 leading-none">{s.v}</div><div className="text-[11px] uppercase tracking-widest opacity-70">{s.l}</div></div>
                     ))}
                   </div>
@@ -253,9 +272,9 @@ const App: React.FC = () => {
         </main>
       </div>
 
-      <AddEntryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onRefresh={fetchEntries} entry={editingEntry} />
+      <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
-      {/* 展開視圖 (分類改英文) */}
+      {/* 展開視圖 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
@@ -264,7 +283,7 @@ const App: React.FC = () => {
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
                 <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
              </div>
-             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
                 <div>
                   <div className="flex gap-3 mb-8">
                     <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
