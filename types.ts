@@ -56,6 +56,6 @@ export const CATEGORY_DISPLAY_MAP: Record<string, string> = {
   [Category.ANIMATION]: 'ANIME',
   [Category.GAME]: 'GAME',
   [Category.DRAMA_SERIES]: 'DRAMA',
-  [Category.GAY]: 'GAY'
+  [Category.GAY]: 'GAY',
    [Category. OTHER]:'OTHER'
 };
