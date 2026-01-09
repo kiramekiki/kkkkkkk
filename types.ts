@@ -6,6 +6,7 @@ export enum Category {
   GAME = '遊戲',
   DRAMA_SERIES = '劇集',
   GAY = '甲片'
+  OTHER = '其他'
 }
 
 export enum Rating {
@@ -56,4 +57,5 @@ export const CATEGORY_DISPLAY_MAP: Record<string, string> = {
   [Category.GAME]: 'GAME',
   [Category.DRAMA_SERIES]: 'DRAMA',
   [Category.GAY]: 'GAY'
+   [Category. OTHER]:'OTHER'
 };
