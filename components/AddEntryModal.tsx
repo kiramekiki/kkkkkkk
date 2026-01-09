@@ -185,7 +185,7 @@ const AddEntryModal: React.FC<AddEntryModalProps> = ({ isOpen, onClose, onRefres
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">心得小記</label>
+              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">感想</label>
               <textarea 
                 value={note} onChange={(e) => setNote(e.target.value)}
                 className="w-full px-4 py-2 rounded border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 focus:border-stone-400 outline-none transition-shadow resize-none h-20 text-sm leading-relaxed"
