@@ -5,7 +5,7 @@ export enum Category {
   ANIMATION = '動畫',
   GAME = '遊戲',
   DRAMA_SERIES = '劇集',
-  GAY = '甲片'
+  GAY = '甲片',
   OTHER = '其他'
 }
 
