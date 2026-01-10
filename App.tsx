@@ -269,19 +269,46 @@ const App: React.FC = () => {
               ))}
             </div>
 
+{/* --- 頁尾統計區域：精確復原圖片樣式 --- */}
             <footer className="mt-20 pb-12">
-              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative shadow-xl">
-                <h3 className="text-2xl font-serif font-medium mb-8">撒下的百合花</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                  {[{ v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' }].map(s => (
-                    <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm"><div className="text-4xl font-bold font-sans mb-1 leading-none">{s.v}</div><div className="text-[11px] uppercase tracking-widest opacity-70">{s.l}</div></div>
-                  ))}
+              <div className="bg-[#8b5e3c] dark:bg-[#2a2420] rounded-2xl p-12 md:p-16 text-center text-white relative overflow-hidden shadow-xl">
+                <div className="relative z-10">
+                  {/* 標題：使用 Serif 字體並拉大字距 */}
+                  <h3 className="text-3xl md:text-4xl font-serif font-medium mb-4 tracking-widest text-white">
+                    撒下的百合花
+                  </h3>
+                  {/* 副標題：稍微透明的白色 */}
+                  <p className="text-sm opacity-85 mb-12 tracking-wide font-light text-white/90">
+                    儘量記錄看過的作品，留存當下的情緒
+                  </p>
+                  
+                  {/* 統計格子：1列4欄佈局 */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                    {[
+                      { v: stats.total, l: '總收藏' },
+                      { v: stats.manga, l: '漫畫' },
+                      { v: stats.novel, l: '小說' },
+                      { v: stats.movie, l: '電影' }
+                    ].map(s => (
+                      <div key={s.l} className="bg-white/10 rounded-xl py-8 px-4 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center">
+                        {/* 數字：【重點】強制使用 font-sans 與 font-bold 確保字形正確 */}
+                        <div className="text-4xl md:text-5xl font-sans font-bold text-white mb-2 leading-none">
+                          {s.v}
+                        </div>
+                        {/* 標籤：微小、全大寫感、拉大字距 */}
+                        <div className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">
+                          {s.l}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+                
+                {/* 裝飾用的背景光暈（選擇性保留，可增加層次感） */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-black/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
               </div>
             </footer>
-          </div>
-        </main>
-      </div>
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
