@@ -72,7 +72,13 @@ const App: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+  
+ const stats = useMemo(() => ({
+    total: entries.length,
+    manga: entries.filter(e => e.category === Category.MANGA).length,
+    novel: entries.filter(e => e.category === Category.NOVEL).length,
+    movie: entries.filter(e => e.category === Category.MOVIE).length
+  }), [entries]);
   // --- 【重點 3】：修復數據處理邏輯 (連動 sortBy) ---
   const processedEntries = useMemo(() => {
     let result = [...entries].filter(entry => {
