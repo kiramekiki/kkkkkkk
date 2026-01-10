@@ -269,13 +269,11 @@ const App: React.FC = () => {
               ))}
             </div>
 
-
-    {/* Footer */}
+            {/* Footer */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-serif font-medium mb-2 text-white tracking-widest">撒下的百合花</h3>
-                  {/* 你要加的那行字 */}
+                  <h3 className="text-2xl font-serif font-medium mb-2 text-white">撒下的百合花</h3>
                   <p className="text-sm opacity-80 mb-10 text-white font-light">儘量記錄看過的作品，留存當下的情緒</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
@@ -285,21 +283,19 @@ const App: React.FC = () => {
                       { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, 
                       { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' } 
                     ].map(s => (
-                      <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm">
+                      <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center">
                         <div className="text-4xl font-bold font-sans mb-1 leading-none text-white">{s.v}</div>
                         <div className="text-[11px] uppercase tracking-widest opacity-70 text-white">{s.l}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
               </div>
             </footer>
           </div> {/* 關閉 max-w-6xl */}
-        </main> {/* 關閉 main (這就是原本漏掉的地方) */}
+        </main> {/* 關閉 main (這行最重要) */}
       </div> {/* 關閉 flex-1 flex flex-col */}
 
-      {/* 彈出視窗與展開視圖 (只保留一份) */}
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
       {expandedEntry && (
@@ -310,7 +306,7 @@ const App: React.FC = () => {
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
                 <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
              </div>
-             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
                 <div>
                   <div className="flex gap-3 mb-8">
                     <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
