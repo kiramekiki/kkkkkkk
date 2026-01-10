@@ -269,36 +269,76 @@ const App: React.FC = () => {
               ))}
             </div>
 
-{/* Footer */}
+
+          {/* Footer */}
             <footer className="mt-20 pb-12">
-              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-10 md:p-16 text-center text-white relative overflow-hidden shadow-xl">
+              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
-                  {/* 1. 標題與副標題：修正字距與字級 */}
-                  <h3 className="text-3xl font-serif font-medium mb-3 tracking-widest">撒下的百合花</h3>
-                  <p className="text-sm opacity-80 mb-12 tracking-wide">儘量記錄看過的作品，留存當下的情緒</p>
+                  <h3 className="text-2xl font-serif font-medium mb-2 text-white">撒下的百合花</h3>
+                  <p className="text-sm opacity-80 mb-10 text-white">儘量記錄看過的作品，留存當下的情緒</p>
                   
-                  {/* 2. 統計方塊：1列4欄佈局 */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                    {[
-                      { v: entries.length, l: '總收藏' },
-                      { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' },
-                      { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' },
-                      { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' }
-                    ].map((s) => (
-                      <div key={s.l} className="bg-white/10 rounded-xl py-8 px-4 border border-white/20 backdrop-blur-sm flex flex-col items-center justify-center">
-                        {/* 3. 數字：強制 font-sans 粗體 */}
-                        <div className="text-4xl font-bold font-sans mb-2 leading-none text-white">{s.v}</div>
-                        {/* 4. 標籤：拉大字距 */}
-                        <div className="text-[11px] uppercase tracking-[0.2em] text-white/70 font-medium">{s.l}</div>
+                    {[ { v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' } ].map(s => (
+                      <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm">
+                        <div className="text-4xl font-bold font-sans mb-1 leading-none text-white">{s.v}</div>
+                        <div className="text-[11px] uppercase tracking-widest opacity-70 text-white">{s.l}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                {/* 背景裝飾光暈 */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
               </div>
             </footer>
+          </div>
+        </main>
+      </div>
+
+      <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
+      
+      {expandedEntry && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
+          <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
+             <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110"><X size={20} /></button>
+             <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
+                <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
+             </div>
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
+                <div>
+                  <div className="flex gap-3 mb-8">
+                    <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
+                      {CATEGORY_DISPLAY_MAP[expandedEntry.category]}
+                    </span>
+                    <span className={`px-4 py-1 rounded-full border text-[11px] font-bold tracking-wider ${RATING_STYLES[expandedEntry.rating]}`}>
+                      {expandedEntry.rating}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight">{expandedEntry.title}</h2>
+                  <p className="text-xl text-stone-400 italic font-serif mb-12">by <span className="text-stone-500">{expandedEntry.author}</span></p>
+                  {expandedEntry.note && (
+                    <div className="relative pl-10 mb-12 border-l border-stone-200">
+                      <p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed">"{expandedEntry.note}"</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between pt-8 border-t border-stone-100">
+                  <div className="flex flex-wrap gap-2">
+                    {expandedEntry.tags?.map(t => <span key={t} className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded text-[10px] text-stone-500 font-bold">#{t}</span>)}
+                  </div>
+                  <div className="flex items-center gap-5 text-stone-300">
+                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
+                    <button onClick={() => handleEdit(expandedEntry)} className="hover:text-stone-800 transition-colors flex items-center gap-1 text-sm font-bold text-stone-500"><Edit2 size={16} />編輯</button>
+                    <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors flex items-center gap-1 text-sm font-bold text-rose-500"><Trash2 size={16} />刪除</button>
+                  </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
 
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
