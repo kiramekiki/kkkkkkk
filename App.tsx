@@ -108,6 +108,18 @@ const App: React.FC = () => {
     { id: 'rating-asc', label: '由低到高' },
   ];
 
+  const handleEdit = (entry: Entry) => { setEditingEntry(entry); setIsModalOpen(true); };
+
+  const handleDelete = async (entryId: string) => {
+    const password = prompt('請輸入管理員密碼：');
+    if (!password) return;
+    if (!confirm('確定刪除嗎？')) return;
+    try {
+      const response = await fetch('/api/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: entryId, password }) });
+      if (response.ok) { fetchEntries(); setExpandedEntry(null); }
+    } catch (err) { alert('失敗'); }
+  };
+
   const stats = useMemo(() => ({
     total: entries.length,
     manga: entries.filter(e => e.category === Category.MANGA).length,
@@ -128,16 +140,14 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 custom-scrollbar">
           <div className="max-w-6xl mx-auto w-full">
             
-            {/* 標題與排版 (完全依照圖一復原) */}
             <section className="text-center mb-16 mt-4">
                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] tracking-widest text-stone-500 dark:text-stone-400 font-bold uppercase mb-6">
                <Heart size={10} className="text-rose-400 fill-rose-400" />
                 Lily Garden Library
               </div>
-              <h1 className="text-4xl md:text-5xl font-serif font-medium text-eart-800 dark:text-stone-100 mb-4 tracking-tight">百合圖書與電影</h1>
+              <h1 className="text-4xl md:text-5xl font-serif font-medium text-earth-800 dark:text-stone-100 mb-4 tracking-tight">百合圖書與電影</h1>
               <p className="text-lg text-earth-500 dark:text-stone-400 italic font-serif mb-8">天から落ちて来る星の破片を墓標に置いて下さい</p>
               
-              {/* 使用指南方塊 */}
               <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
                 <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🗡️</div>
                 <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
@@ -151,11 +161,9 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            {/* 搜尋吧 (比照圖一，不換行) */}
             <div className="sticky top-0 z-10 bg-earth-50/95 dark:bg-[#191919]/95 backdrop-blur-sm py-5 mb-8 border-b border-stone-200/60">
               <div className="flex flex-nowrap items-center gap-2 overflow-x-auto hide-scrollbar">
                 
-                {/* 分類按鈕 (修正選中樣式，比照圖二) */}
                 <div className="flex items-center gap-1">
                   {categoriesList.map(cat => {
                     const isSelected = selectedCategory === cat.id;
@@ -166,7 +174,7 @@ const App: React.FC = () => {
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-sm whitespace-nowrap transition-all border 
                           ${isSelected 
                             ? (isDarkMode 
-                                ? 'bg-stone-800 border-stone-200 text-white shadow-sm font-medium' // 圖二深色選中樣式
+                                ? 'bg-stone-800 border-stone-200 text-white shadow-sm font-medium'
                                 : 'bg-white border-stone-300 text-stone-800 shadow-sm font-medium') 
                             : 'border-transparent text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
                       >
@@ -178,17 +186,23 @@ const App: React.FC = () => {
 
                 <div className="h-6 w-px bg-stone-200 mx-2 flex-shrink-0" />
 
-             {/* 所有等級按鈕 (修復點擊) */}
-                <div className="relative flex-shrink-0">
-                  <button onClick={() => setIsRatingDropdownOpen(!isRatingDropdownOpen)} className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800">
+                {/* --- 更改處 1：等級下拉按鈕 --- */}
+                <div className="relative flex-shrink-0" ref={ratingDropdownRef}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setIsRatingDropdownOpen(!isRatingDropdownOpen); }} 
+                    className="flex items-center gap-1 px-2 py-1.5 text-sm text-stone-500 hover:text-stone-800"
+                  >
                     <span>{ratingOptions.find(o => o.id === selectedRating)?.label}</span>
-                    <ChevronDown size={14} className={isRatingDropdownOpen ? 'rotate-180' : ''} />
+                    <ChevronDown size={14} className={isRatingDropdownOpen ? 'rotate-180 transition-transform' : ''} />
                   </button>
                   {isRatingDropdownOpen && (
                     <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {ratingOptions.map(o => (
-                        <button key={o.id} onClick={() => { setSelectedRating(o.id as any); setIsRatingDropdownOpen(false); }} 
-                          className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 ${selectedRating === o.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-stone-50 text-stone-600'}`}>
+                        <button 
+                          key={o.id} 
+                          onClick={() => { setSelectedRating(o.id as any); setIsRatingDropdownOpen(false); }} 
+                          className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors ${selectedRating === o.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-stone-50 text-stone-600'}`}
+                        >
                           <span className="text-base">{o.emoji}</span><span>{o.label}</span>
                         </button>
                       ))}
@@ -196,30 +210,33 @@ const App: React.FC = () => {
                   )}
                 </div>
 
-
-                {/* 搜尋框 */}
                 <div className="flex-1 relative min-w-[150px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-300" size={16} />
                   <input type="text" placeholder="搜尋..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-white dark:bg-stone-800 border border-stone-200/60 rounded-md text-sm outline-none focus:border-stone-400 transition-all" />
                 </div>
 
-                {/* 新增按鈕 */}
                 <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5 px-4 py-2 bg-[#5e5045] text-white rounded-md text-sm font-bold shadow-sm hover:bg-[#4a403a] flex-shrink-0 whitespace-nowrap">
                   <Plus size={18} /><span>新增</span>
                 </button>
 
-                  {/* 排序按鈕 (修復點擊) */}
-                <div className="relative flex-shrink-0">
-                  <button onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)} className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm">
+                {/* --- 更改處 2：排序按鈕 --- */}
+                <div className="relative flex-shrink-0" ref={sortDropdownRef}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setIsSortDropdownOpen(!isSortDropdownOpen); }} 
+                    className="flex items-center gap-1.5 px-2 py-2 text-stone-500 hover:text-stone-800 text-sm"
+                  >
                     <ArrowUpDown size={15} />
                     <span className="font-medium">{sortOptions.find(o => o.id === sortBy)?.label}</span>
-                    <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180' : ''} />
+                    <ChevronDown size={14} className={isSortDropdownOpen ? 'rotate-180 transition-transform' : ''} />
                   </button>
                   {isSortDropdownOpen && (
                     <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-stone-100 shadow-xl rounded-lg z-50 overflow-hidden">
                       {sortOptions.map(o => (
-                        <button key={o.id} onClick={() => { setSortBy(o.id as any); setIsSortDropdownOpen(false); }} 
-                          className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center ${sortBy === o.id ? 'bg-stone-50 text-stone-900 font-bold' : 'text-stone-500 hover:bg-stone-50'}`}>
+                        <button 
+                          key={o.id} 
+                          onClick={() => { setSortBy(o.id as any); setIsSortDropdownOpen(false); }} 
+                          className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center ${sortBy === o.id ? 'bg-stone-50 text-stone-900 font-bold' : 'text-stone-500 hover:bg-stone-50'}`}
+                        >
                           <span>{o.label}</span>
                           {sortBy === o.id && <Check size={14} className="text-stone-400" />}
                         </button>
@@ -231,7 +248,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* 卡片區域 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {processedEntries.map((entry) => (
                 <div key={entry.id} onClick={() => setExpandedEntry(entry)} className="flex bg-white dark:bg-[#202020] rounded-lg overflow-hidden border border-stone-100 dark:border-stone-800 shadow-soft hover:shadow-md transition-all cursor-pointer group h-48 relative">
@@ -252,7 +268,6 @@ const App: React.FC = () => {
               ))}
             </div>
 
-            {/* Footer */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
@@ -271,10 +286,9 @@ const App: React.FC = () => {
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
-      {/* 展開視圖 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => setExpandedEntry(null)} />
           <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
@@ -303,7 +317,9 @@ const App: React.FC = () => {
                     {expandedEntry.tags?.map(t => <span key={t} className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded text-[10px] text-stone-500 font-bold">#{t}</span>)}
                   </div>
                   <div className="flex items-center gap-5 text-stone-300">
-                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
+                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" rel="noopener noreferrer" className="hover:text-stone-800 transition-colors">
+                      <PlurkPIcon size={20} />
+                    </a>}
                     <button onClick={() => handleEdit(expandedEntry)} className="hover:text-stone-800 transition-colors"><Edit2 size={16} /></button>
                     <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
                   </div>
