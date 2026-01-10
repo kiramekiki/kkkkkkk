@@ -270,7 +270,7 @@ const App: React.FC = () => {
             </div>
 
 
-       {/* Footer */}
+      {/* Footer */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
@@ -293,13 +293,14 @@ const App: React.FC = () => {
                 </div>
               </div>
             </footer>
-          </div>
-        </main>
-      </div>
+          </div> {/* 1. 關閉 max-w-6xl */}
+        </main> {/* 2. 關閉 main (這就是報錯的原因) */}
+      </div> {/* 3. 關閉 flex-1 flex flex-col */}
 
-      {/* 這裡是彈出視窗（只保留一份，修復重複問題） */}
+      {/* 這裡是彈出視窗 (Modal) */}
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
+      {/* 這裡是展開視圖 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
@@ -308,11 +309,11 @@ const App: React.FC = () => {
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
                 <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
              </div>
-             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
                 <div>
                   <div className="flex gap-3 mb-8">
                     <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
-                      {expandedEntry.category.toUpperCase()}
+                      {CATEGORY_DISPLAY_MAP[expandedEntry.category]}
                     </span>
                     <span className={`px-4 py-1 rounded-full border text-[11px] font-bold tracking-wider ${RATING_STYLES[expandedEntry.rating]}`}>
                       {expandedEntry.rating}
@@ -331,7 +332,7 @@ const App: React.FC = () => {
                     {expandedEntry.tags?.map(t => <span key={t} className="px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded text-[10px] text-stone-500 font-bold">#{t}</span>)}
                   </div>
                   <div className="flex items-center gap-5 text-stone-300">
-                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" rel="noopener noreferrer" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
+                    {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
                     <button onClick={() => handleEdit(expandedEntry)} className="hover:text-stone-800 transition-colors flex items-center gap-1 text-sm font-bold text-stone-500"><Edit2 size={16} />編輯</button>
                     <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors flex items-center gap-1 text-sm font-bold text-rose-500"><Trash2 size={16} />刪除</button>
                   </div>
@@ -340,7 +341,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </div> // 4. 關閉最外層 flex min-h-screen
   );
 };
 
