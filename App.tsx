@@ -270,12 +270,13 @@ const App: React.FC = () => {
             </div>
 
 
-      {/* Footer */}
+    {/* Footer */}
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-serif font-medium mb-2 text-white">撒下的百合花</h3>
-                  <p className="text-sm opacity-80 mb-10 text-white">儘量記錄看過的作品，留存當下的情緒</p>
+                  <h3 className="text-2xl font-serif font-medium mb-2 text-white tracking-widest">撒下的百合花</h3>
+                  {/* 你要加的那行字 */}
+                  <p className="text-sm opacity-80 mb-10 text-white font-light">儘量記錄看過的作品，留存當下的情緒</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                     {[ 
@@ -291,16 +292,16 @@ const App: React.FC = () => {
                     ))}
                   </div>
                 </div>
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
               </div>
             </footer>
-          </div> {/* 1. 關閉 max-w-6xl */}
-        </main> {/* 2. 關閉 main (這就是報錯的原因) */}
-      </div> {/* 3. 關閉 flex-1 flex flex-col */}
+          </div> {/* 關閉 max-w-6xl */}
+        </main> {/* 關閉 main (這就是原本漏掉的地方) */}
+      </div> {/* 關閉 flex-1 flex flex-col */}
 
-      {/* 這裡是彈出視窗 (Modal) */}
+      {/* 彈出視窗與展開視圖 (只保留一份) */}
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
-      {/* 這裡是展開視圖 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setExpandedEntry(null)} />
@@ -309,7 +310,7 @@ const App: React.FC = () => {
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0">
                 <img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt={expandedEntry.title} />
              </div>
-             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
+             <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto">
                 <div>
                   <div className="flex gap-3 mb-8">
                     <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">
@@ -341,7 +342,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-    </div> // 4. 關閉最外層 flex min-h-screen
+    </div> // 關閉最外層 flex min-h-screen
   );
 };
 
