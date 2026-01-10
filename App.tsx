@@ -275,15 +275,17 @@ const App: React.FC = () => {
               ))}
             </div>
 
-            {/* Footer */}
+            {/* Footer Stats */}
             <footer className="mt-20 pb-12">
-              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">
-                <div className="relative z-10">
-                  <h3 className="text-3xl font-serif font-medium mb-4 text-white">撒下的百合花</h3>
-                  <p className="text-sm opacity-90 mb-7 text-white font-light">儘量記錄看過的作品，留存當下的情緒</p>
+              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-xl p-8 md:p-12 text-center text-[#fbf7f3] dark:text-stone-300 relative overflow-hidden shadow-lg transition-all duration-500">
+                <div className="relative z-10 flex flex-col items-center">
+                  <h3 className="text-3xl font-serif font-medium mb-4 text-white tracking-wide">撒下的百合花</h3>
+                  <p className="text-sm opacity-90 leading-7 max-w-lg mx-auto mb-10 text-stone-100">
+                    儘量記錄看過的作品，留存當下的情緒
+                  </p>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                    {[ 
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
+                     {[
                       { v: entries.length, l: '總收藏' }, 
                       { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, 
                       { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, 
