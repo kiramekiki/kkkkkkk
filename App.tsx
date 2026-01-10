@@ -269,38 +269,35 @@ const App: React.FC = () => {
               ))}
             </div>
 
-   {/* Footer Stats */}
+{/* Footer */}
             <footer className="mt-20 pb-12">
-              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-xl p-8 md:p-12 text-center text-[#fbf7f3] dark:text-stone-300 relative overflow-hidden shadow-lg transition-all duration-500">
-                <div className="relative z-10 flex flex-col items-center">
-                  <h3 className="text-3xl font-serif font-medium mb-4 text-white tracking-wide">撒下的百合花</h3>
-                  <p className="text-sm opacity-90 leading-7 max-w-lg mx-auto mb-10 text-stone-100">
-                    儘量記錄看過的作品，留存當下的情緒
-                  </p>
+              {/* 修改：加大內距 p-12 md:p-16 讓視覺更開闊 */}
+              <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-12 md:p-16 text-center text-white relative overflow-hidden shadow-xl">
+                <div className="relative z-10">
+                  {/* 修改：字體加大 text-3xl 並增加字距 tracking-widest */}
+                  <h3 className="text-3xl font-serif font-medium mb-3 tracking-widest">撒下的百合花</h3>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-                     {[
-                       { v: stats.total, l: '總收藏' },
-                       { v: stats.manga, l: '漫畫' },
-                       { v: stats.novel, l: '小說' },
-                       { v: stats.movie, l: '電影' }
-                     ].map(s => (
-                       <div key={s.l} className="bg-white/10 dark:bg-stone-900/20 rounded-lg p-4 backdrop-blur-sm flex flex-col items-center justify-center h-24 border border-white/10 hover:bg-white/20 transition-colors group/stat">
-                          <span className="text-3xl font-bold text-white mb-1 group-hover/stat:scale-110 transition-transform">{s.v}</span>
-                          <span className="text-xs text-stone-100 tracking-wider font-medium opacity-80">
-                            {s.l}
-                          </span>
-                       </div>
-                     ))}
+                  {/* 新增：補上圖片中的副標題文字 */}
+                  <p className="text-sm opacity-80 mb-12 tracking-wide">儘量記錄看過的作品，留存當下的情緒</p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    {[ { v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' } ].map(s => (
+                      /* 修改：方塊內距調整 py-8，圓角改為更加圓潤的 xl */
+                      <div key={s.l} className="bg-white/10 rounded-xl py-8 px-4 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center">
+                        {/* 修改：數字 text-4xl 確保字形粗壯清晰 */}
+                        <div className="text-4xl font-bold font-sans mb-2 leading-none text-white">{s.v}</div>
+                        {/* 修改：標籤文字字距拉大 tracking-[0.2em] 更有設計感 */}
+                        <div className="text-[11px] uppercase tracking-[0.2em] text-white/70 font-medium">{s.l}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-black/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+
+                {/* 新增：為了更有氛圍，加入輕微的裝飾光暈（可選） */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
               </div>
             </footer>
-          </div>
-        </main>
-      </div>
 
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
