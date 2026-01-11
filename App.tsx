@@ -301,27 +301,26 @@ const App: React.FC = () => {
               </div>
             )}
             
+            {/* 卡片區域：改用分頁後的 paginatedEntries */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {processedEntries.map((entry) => (
-                <div key={entry.id} onClick={() => { setExpandedEntry(entry); setIsEditingExpanded(false); }} className="flex bg-white dark:bg-[#202020] rounded-lg overflow-hidden border border-stone-100 dark:border-stone-800 shadow-soft hover:shadow-md transition-all cursor-pointer group h-48 relative">
-                  <div className="w-32 bg-stone-100 flex-shrink-0 relative"><img src={entry.coverUrl} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" alt="" /></div>
+              {paginatedEntries.map((entry) => (
+                <div key={entry.id} onClick={() => { setExpandedEntry(entry); setIsEditingExpanded(false); }} className="flex bg-white dark:bg-[#202020] rounded-lg overflow-hidden border border-stone-100 dark:border-stone-800 shadow-soft hover:shadow-md transition-all cursor-pointer group h-48 relative text-left">
+                  <div className="w-32 bg-stone-100 flex-shrink-0 relative">
+                     {/* ★★★ 增加 loading="lazy" 優化載入速度 */}
+                     <img src={entry.coverUrl} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" alt="" loading="lazy" />
+                  </div>
                   <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden">
                     <div>
-                      <div className="flex justify-between items-start mb-1">
+                      <div className="flex justify-between items-start mb-1 text-left">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400">{CATEGORY_DISPLAY_MAP[entry.category]}</div>
                         <span className={`text-[10px] px-2 py-0.5 rounded border ${RATING_STYLES[entry.rating]}`}>{entry.rating}</span>
                       </div>
                       <h3 className="text-xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-1 leading-tight line-clamp-1">{entry.title}</h3>
-                      <p className="text-xs text-stone-500 mb-2">by {entry.author}</p>
-                  {/* ★★★ 重點 4：小卡片支援換行反應 (whitespace-pre-wrap) */}
-                      {entry.note && (
-                        <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 leading-relaxed text-left whitespace-pre-wrap">
-                          "{entry.note}"
-                        </p>
-                      )}
+                      <p className="text-xs text-stone-500 mb-2 text-left">by {entry.author}</p>
+                      {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 text-left leading-relaxed whitespace-pre-wrap">"{entry.note}"</p>}
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {entry.tags?.slice(0, 6).map(tag => (
+                      {entry.tags?.slice(0, 3).map(tag => (
                         <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{tag}</span>
                       ))}
                     </div>
@@ -330,7 +329,40 @@ const App: React.FC = () => {
               ))}
             </div>
 
-
+ {/* ★★★ 分頁控制 UI */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-12 mb-8">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-full border border-stone-200 bg-white hover:bg-stone-50 disabled:opacity-30 transition-all shadow-sm dark:bg-stone-800 dark:border-stone-700"
+                >
+                  <ChevronLeft size={20} className="text-stone-600 dark:text-stone-300" />
+                </button>
+                <div className="flex gap-1.5">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button 
+                      key={i + 1}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-full text-sm font-bold transition-all border
+                        ${currentPage === i + 1 
+                          ? 'bg-[#8c7b6d] border-[#8c7b6d] text-white shadow-md' 
+                          : 'bg-white border-stone-200 text-stone-500 hover:border-stone-400 dark:bg-stone-800 dark:border-stone-700'}`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-full border border-stone-200 bg-white hover:bg-stone-50 disabled:opacity-30 transition-all shadow-sm dark:bg-stone-800 dark:border-stone-700"
+                >
+                  <ChevronRight size={20} className="text-stone-600 dark:text-stone-300" />
+                </button>
+              </div>
+            )}
+            
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative shadow-xl overflow-hidden">
                 <div className="relative z-10">
