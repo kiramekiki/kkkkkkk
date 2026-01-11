@@ -91,7 +91,7 @@ const App: React.FC = () => {
       : expandedEntry.tags;
 
     try {
-      const response = await fetch('/api/update', { 
+      const response = await fetch('/api/edit', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ 
