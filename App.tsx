@@ -32,6 +32,10 @@ const App: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]); // 複數標籤篩選
   const [isEditingExpanded, setIsEditingExpanded] = useState(false); // 原地編輯開關
   const [editForm, setEditForm] = useState<Partial<Entry>>({}); // 編輯緩存
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // --- 【標註區域 1：itemsPerPage 設定】 ---
+  const itemsPerPage = 24; // ★★★ 每頁顯示 24 張，讀取快且工整
   
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,8 +118,19 @@ const App: React.FC = () => {
     } catch (err) { alert('更新發生錯誤'); }
   };
 
-  const processedEntries = useMemo(() => {
-    let result = [...entries].filter(entry => {
+  // --- 【標註區域 2：合併後的 stats (唯一一組)】 ---
+  // ★★★ 這是頁尾讀取的數據，確保不重複定義
+  const stats = useMemo(() => ({
+    total: entries.length,
+    manga: entries.filter(e => e.category === Category.MANGA).length,
+    novel: entries.filter(e => e.category === Category.NOVEL).length,
+    movie: entries.filter(e => e.category === Category.MOVIE).length
+  }), [entries]);
+
+  // --- 【標註區域 3：合併後的 processedEntries (唯一一組)】 ---
+  // ★★★ 這裡整合了篩選、複數標籤、排序以及分頁切片邏輯
+  const { paginatedEntries, totalPages } = useMemo(() => {
+    let filtered = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
       const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || entry.author.toLowerCase().includes(searchTerm.toLowerCase());
@@ -123,7 +138,7 @@ const App: React.FC = () => {
       const matchesTags = selectedTags.length === 0 || selectedTags.every(t => entryTags.includes(t));
       return matchesCategory && matchesRating && matchesSearch && matchesTags;
     });
-  
+    
     result.sort((a, b) => {
       if (sortBy === 'date-desc') return (b.createdAt || 0) - (a.createdAt || 0);
       if (sortBy === 'date-asc') return (a.createdAt || 0) - (b.createdAt || 0);
