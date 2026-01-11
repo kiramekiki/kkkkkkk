@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-// ★★★ 更改 1：補上 Save 組件導入，防止點擊編輯時崩潰
+// ★★★ 重點 1：新增 Save 圖示導入
 import { Menu, Moon, Sun, Search, Plus, Heart, ChevronDown, Check, LayoutGrid, BookOpen, Book, Film, Tv, Gamepad2, Info, Loader2, ArrowUpDown, Clapperboard, X, Edit2, Trash2, Save } from 'lucide-react'; 
 import { Category, Entry, RATING_STYLES, RATING_WEIGHTS, Rating, CATEGORY_STYLES, CATEGORY_DISPLAY_MAP } from './types';
 import Sidebar from './components/Sidebar';
@@ -356,6 +356,7 @@ const App: React.FC = () => {
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0"><img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt="" /></div>
              
+   {/* ★★★ 重點 4：右側加入捲軸控制 overflow-y-auto */}
              <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar text-left text-stone-800 dark:text-stone-100">
                 {isEditingExpanded ? (
                   /* --- 完整編輯模式介面 (比照截圖排列) --- */
