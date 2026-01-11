@@ -9,53 +9,27 @@ interface SidebarProps {
   onSelectCategory: (cat: any) => void;
 }
 
-// 核心組件：中文字體優化版的圓弧文字郵票按鈕
+// 核心組件：純淨版郵票按鈕
 const SupportStamp = ({ 
   imgSrc, 
-  topText, 
-  bottomText, 
   link 
 }: { 
   imgSrc: string; 
-  topText: string; 
-  bottomText: string; 
   link: string 
 }) => (
   <a 
     href={link} 
     target="_blank" 
     rel="noopener noreferrer" 
-    className="group relative flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+    className="group relative flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
   >
-    {/* 容器 w-32 h-32 */}
-    <div className="relative w-32 h-32 flex items-center justify-center">
+    {/* 尺寸微調為 w-24，維持精緻感 */}
+    <div className="relative w-24 h-24 flex items-center justify-center">
       <img 
         src={imgSrc} 
-        className="w-[82%] h-[82%] object-contain drop-shadow-md opacity-95 group-hover:opacity-100 transition-opacity" 
+        className="w-full h-full object-contain drop-shadow-md opacity-90 group-hover:opacity-100 transition-opacity" 
         alt="support icon" 
       />
-      
-      {/* SVG 圓弧文字層：中文字體稍微放大一點到 9px */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
-        <defs>
-          <path id="pathTop" d="M 18,50 A 32,32 0 0,1 82,50" fill="transparent" />
-          <path id="pathBottom" d="M 18,50 A 32,32 0 0,0 82,50" fill="transparent" />
-        </defs>
-        
-        {/* 上半部中文字 */}
-        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[9px] font-bold tracking-[0.1em]">
-          <textPath href="#pathTop" startOffset="50%" textAnchor="middle">
-            {topText}
-          </textPath>
-        </text>
-        
-        {/* 下半部中文字 */}
-        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[9px] font-bold tracking-[0.1em]">
-          <textPath href="#pathBottom" startOffset="50%" textAnchor="middle">
-            {bottomText}
-          </textPath>
-        </text>
-      </svg>
     </div>
   </a>
 );
@@ -111,37 +85,38 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* 贊助區域：依照要求標註左右與更換文字 --- */}
-          <div className="mt-auto pt-6 border-t border-stone-300/30">
-            <h3 className="text-sm font-bold text-[#5E5045] dark:text-stone-300 text-center mb-6 tracking-widest">
-              請我喝一杯手搖 🧋
-            </h3>
+          {/* --- 贊助區域：和諧化字體與佈局 --- */}
+          <div className="mt-auto pt-6 border-t border-stone-300/30 text-center">
+            <div className="mb-6">
+              <h3 className="text-xl font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-tight">
+                請我喝一杯手搖 🥤
+              </h3>
+              <p className="text-[12px] text-[#A8A29E] font-medium mt-1 tracking-wider">
+                四捨五入算是一種推金幣
+              </p>
+            </div>
             
-            <div className="flex justify-center gap-2">
-              {/* 左側：TWQR - 澆花器 */}
+            <div className="flex justify-center gap-4 mb-6">
+              {/* 左側：TWQR */}
               <div className="flex flex-col items-center">
-                <span className="text-[10px] font-bold text-[#A8A29E] mb-1">TWQR</span>
+                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-1">TWQR</span>
                 <SupportStamp 
                   imgSrc="/support-garden.png" 
-                  topText="四捨" 
-                  bottomText="五入" 
                   link="https://qr.opay.tw/8yfYV"
                 />
               </div>
 
-              {/* 右側：普通 - 手搖飲 */}
+              {/* 右側：普通 */}
               <div className="flex flex-col items-center">
-                <span className="text-[10px] font-bold text-[#A8A29E] mb-1">普通</span>
+                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-1">普通</span>
                 <SupportStamp 
                   imgSrc="/support-tea.png" 
-                  topText="算是一種" 
-                  bottomText="推金幣" 
                   link="https://qr.opay.tw/jjWD2"
                 />
               </div>
             </div>
             
-            <div className="text-center mt-4">
+            <div className="text-center">
               <p className="text-[10px] text-[#A8A29E] opacity-50 font-serif italic">Lily Library © 2026</p>
             </div>
           </div>
