@@ -26,6 +26,12 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<Category | 'ALL'>('ALL');
   const [selectedRating, setSelectedRating] = useState<Rating | 'ALL'>('ALL');
+  
+   // ★★★ 重點：標籤篩選與原地編輯狀態
+  const [selectedTags, setSelectedTags] = useState<string[]>([]); 
+  const [isEditingExpanded, setIsEditingExpanded] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<Entry>>({});
+  
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,11 +39,6 @@ const App: React.FC = () => {
   const [expandedEntry, setExpandedEntry] = useState<Entry | null>(null);
   const [isRatingDropdownOpen, setIsRatingDropdownOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-
-   // ★★★ 【功能新增：原地編輯與標籤篩選的狀態】
-  const [selectedTags, setSelectedTags] = useState<string[]>([]); // 存放被選中的多個標籤
-  const [isEditingExpanded, setIsEditingExpanded] = useState(false); // 控制大卡片是否處於編輯模式
-  const [editForm, setEditForm] = useState<Partial<Entry>>({}); // 存放編輯中的暫時文字資料
   
   // --- 【重點 2】：透過 Ref 鎖定整個下拉選單區域 ---
   const ratingDropdownRef = useRef<HTMLDivElement>(null);
@@ -78,50 +79,43 @@ const App: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-    // ★★★ 【功能新增：標籤切換邏輯】
+  // ★★★ 重點：標籤切換邏輯
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
+    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
   };
 
-  // ★★★ 【功能新增：原地編輯儲存邏輯】
+  // ★★★ 重點：原地儲存邏輯
   const handleInlineSave = async () => {
     if (!expandedEntry) return;
     try {
       const response = await fetch('/api/update', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...expandedEntry, ...editForm }),
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ ...expandedEntry, ...editForm }) 
       });
       if (response.ok) {
         setIsEditingExpanded(false);
-        setExpandedEntry({ ...expandedEntry, ...editForm } as Entry); // 即時更新大卡片內容
-        fetchEntries(); // 重新整理列表
-      } else {
-        alert('儲存失敗');
-      }
-    } catch (err) { alert('連線發生錯誤'); }
+        setExpandedEntry({ ...expandedEntry, ...editForm } as Entry);
+        fetchEntries();
+      } else { alert('儲存失敗'); }
+    } catch (err) { alert('更新發生錯誤'); }
   };
-  
+
  const stats = useMemo(() => ({
     total: entries.length,
     manga: entries.filter(e => e.category === Category.MANGA).length,
     novel: entries.filter(e => e.category === Category.NOVEL).length,
     movie: entries.filter(e => e.category === Category.MOVIE).length
   }), [entries]);
-  // --- 【重點 3】：修復數據處理邏輯 (連動 sortBy) ---
+  
+  // --- 【修正：整合篩選與排序邏輯，解決報錯關鍵】 ---
   const processedEntries = useMemo(() => {
     let result = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
       const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || entry.author.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesCategory && matchesRating && matchesSearch;
-    });
-    
-    // ★★★ 【功能修改：加入複數標籤篩選過濾】
+      // ★ 標籤複數過濾
       const matchesTags = selectedTags.length === 0 || selectedTags.every(t => entry.tags?.includes(t));
-      
       return matchesCategory && matchesRating && matchesSearch && matchesTags;
     });
   
@@ -290,14 +284,12 @@ const App: React.FC = () => {
               </div>
             </div>
 
-               {/* ★★★ 【功能新增：顯示目前正在篩選的標籤】 */}
+             {/* ★★★ 篩選標籤顯示區 */}
             {selectedTags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mb-6 animate-in fade-in">
                 <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mr-2">正在篩選標籤:</span>
                 {selectedTags.map(tag => (
-                  <button key={tag} onClick={() => toggleTag(tag)} className="flex items-center gap-1.5 px-3 py-1 bg-[#8c7b6d] text-white rounded-full text-xs font-bold hover:bg-[#5e5045] transition-all">
-                    #{tag} <X size={12} />
-                  </button>
+                  <button key={tag} onClick={() => toggleTag(tag)} className="flex items-center gap-1.5 px-3 py-1 bg-[#8c7b6d] text-white rounded-full text-xs font-bold hover:bg-[#5e5045] transition-all">#{tag} <X size={12} /></button>
                 ))}
                 <button onClick={() => setSelectedTags([])} className="text-[10px] text-stone-400 hover:text-rose-500 font-bold underline ml-2">清除所有</button>
               </div>
@@ -319,7 +311,7 @@ const App: React.FC = () => {
                       <p className="text-xs text-stone-500 mb-2">by {entry.author}</p>
                       {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2">"{entry.note}"</p>}
                     </div>
-                    {/* ★★★ 【功能修改：卡片上的標籤點擊篩選】 */}
+                    {/* ★★★ 小卡片標籤點擊篩選 */}
                     <div className="flex flex-wrap gap-2 mt-2">
                       {entry.tags?.slice(0, 3).map(tag => (
                         <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{tag}</span>
@@ -361,58 +353,41 @@ const App: React.FC = () => {
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
-       {/* ★★★ 【功能修改：大卡片展開視圖 - 加入原地編輯邏輯】 */}
+        {/* ★★★ 大卡片展開視圖 (加入原地編輯介面) */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => { if(!isEditingExpanded) setExpandedEntry(null); }} />
           <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110"><X size={20} /></button>
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0"><img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt="" /></div>
-             
              <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar">
                 {isEditingExpanded ? (
-                  // ★★★ 原地編輯模式介面
+                  // 原地編輯模式
                   <div className="text-left space-y-6">
-                    <h2 className="text-xl font-bold text-stone-400 uppercase tracking-widest mb-4">正在原地編輯資料</h2>
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-400 block mb-1">作品標題</label>
-                      <input className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d] transition-all" defaultValue={expandedEntry.title} onChange={e => setEditForm({...editForm, title: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-400 block mb-1">作者</label>
-                      <input className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d] transition-all" defaultValue={expandedEntry.author} onChange={e => setEditForm({...editForm, author: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-400 block mb-1">感想</label>
-                      <textarea className="w-full p-3 bg-white border border-stone-200 rounded-xl h-32 outline-none focus:border-[#8c7b6d] transition-all resize-none" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} />
-                    </div>
-                    <div className="flex gap-3 pt-4">
-                      <button onClick={handleInlineSave} className="flex-1 py-4 bg-[#8c7b6d] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"><Save size={18}/>儲存更改</button>
-                      <button onClick={() => setIsEditingExpanded(false)} className="px-8 py-4 bg-stone-100 text-stone-500 rounded-2xl font-bold">取消</button>
-                    </div>
+                    <h2 className="text-xl font-bold text-stone-400 uppercase tracking-widest mb-4">原地編輯模式</h2>
+                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1">標題</label><input className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.title} onChange={e => setEditForm({...editForm, title: e.target.value})} /></div>
+                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1">作者</label><input className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.author} onChange={e => setEditForm({...editForm, author: e.target.value})} /></div>
+                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1">心得</label><textarea className="w-full p-3 bg-white border border-stone-200 rounded-xl h-32 outline-none resize-none" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} /></div>
+                    <div className="flex gap-3 pt-4"><button onClick={handleInlineSave} className="flex-1 py-4 bg-[#8c7b6d] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"><Save size={18}/>儲存更改</button><button onClick={() => setIsEditingExpanded(false)} className="px-8 py-4 bg-stone-100 text-stone-500 rounded-2xl font-bold">取消</button></div>
                   </div>
                 ) : (
-                  // 原有的顯示模式介面
+                  // 顯示模式
                   <div className="text-left flex flex-col h-full justify-between">
                     <div>
                       <div className="flex gap-3 mb-8">
-                        <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">{expandedEntry.category.toUpperCase()}</span>
+                        <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">{CATEGORY_DISPLAY_MAP[expandedEntry.category]}</span>
                         <span className={`px-4 py-1 rounded-full border text-[11px] font-bold tracking-wider ${RATING_STYLES[expandedEntry.rating]}`}>{expandedEntry.rating}</span>
                       </div>
                       <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight">{expandedEntry.title}</h2>
-                      <p className="text-xl text-stone-400 italic font-serif mb-12 text-left">by <span className="text-stone-500">{expandedEntry.author}</span></p>
-                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed text-left">"{expandedEntry.note}"</p></div>}
+                      <p className="text-xl text-stone-400 italic font-serif mb-12">by <span className="text-stone-500">{expandedEntry.author}</span></p>
+                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed">"{expandedEntry.note}"</p></div>}
                     </div>
                     <div className="flex items-center justify-between pt-8 border-t border-stone-100">
                       <div className="flex flex-wrap gap-2">
-                        {/* ★★★ 大卡片標籤：點擊後關閉視窗並開始篩選 */}
-                        {expandedEntry.tags?.map(t => (
-                          <span key={t} onClick={() => { toggleTag(t); setExpandedEntry(null); }} className={`px-3 py-1 rounded text-[10px] font-bold cursor-pointer transition-colors ${selectedTags.includes(t) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{t}</span>
-                        ))}
+                        {expandedEntry.tags?.map(t => <span key={t} onClick={() => { toggleTag(t); setExpandedEntry(null); }} className={`px-3 py-1 rounded text-[10px] font-bold cursor-pointer transition-colors ${selectedTags.includes(t) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{t}</span>)}
                       </div>
                       <div className="flex items-center gap-5 text-stone-300">
                         {expandedEntry.plurkUrl && <a href={expandedEntry.plurkUrl} target="_blank" rel="noopener noreferrer" className="hover:text-stone-800 transition-colors"><PlurkPIcon size={20} /></a>}
-                        {/* ★★★ 點擊編輯按鈕：進入原地編輯模式 */}
                         <button onClick={() => { setEditForm(expandedEntry); setIsEditingExpanded(true); }} className="hover:text-stone-800 transition-colors flex items-center gap-1 text-sm font-bold"><Edit2 size={16} />編輯</button>
                         <button onClick={() => handleDelete(expandedEntry.id)} className="hover:text-rose-500 transition-colors flex items-center gap-1 text-sm font-bold"><Trash2 size={16} />刪除</button>
                       </div>
