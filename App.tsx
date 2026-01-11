@@ -416,8 +416,14 @@ const App: React.FC = () => {
                       </div>
                       <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight">{expandedEntry.title}</h2>
                       <p className="text-xl text-stone-400 italic font-serif mb-12 text-left">by <span className="text-stone-500">{expandedEntry.author}</span></p>
-                      {/* ★★★ 這裡已經移除 italic，大卡片感想恢復為正體 */}
-                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif leading-relaxed text-left">"{expandedEntry.note}"</p></div>}
+                         {/* ★★★ 重點 6：分段顯示 whitespace-pre-wrap 且非斜體 */}
+                      {expandedEntry.note && (
+                        <div className="relative pl-10 mb-12 border-l border-stone-200">
+                          <p className="text-lg text-stone-600 dark:text-stone-400 font-serif leading-relaxed text-left whitespace-pre-wrap">
+                            {expandedEntry.note}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center justify-between pt-8 border-t border-stone-100">
                       <div className="flex flex-wrap gap-2">
