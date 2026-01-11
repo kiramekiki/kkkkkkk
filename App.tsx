@@ -196,7 +196,7 @@ const App: React.FC = () => {
               {/* 使用指南方塊 */}
               <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
                 <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🗡️</div>
-                <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
+                <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同就完全沒有意義。</p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
                   <span><b>聖經</b>：某種神的旨意</span>
                   <span><b>極品</b>：印象深刻且強勁或全方位優質</span>
@@ -313,11 +313,15 @@ const App: React.FC = () => {
                       </div>
                       <h3 className="text-xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-1 leading-tight line-clamp-1">{entry.title}</h3>
                       <p className="text-xs text-stone-500 mb-2">by {entry.author}</p>
-                      {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 leading-relaxed">"{entry.note}"</p>}
+                  {/* ★★★ 重點 4：小卡片支援換行反應 (whitespace-pre-wrap) */}
+                      {entry.note && (
+                        <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 leading-relaxed text-left whitespace-pre-wrap">
+                          "{entry.note}"
+                        </p>
+                      )}
                     </div>
-                    {/* ★ 小卡片標籤篩選 */}
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {entry.tags?.slice(0, 3).map(tag => (
+                      {entry.tags?.slice(0, 6).map(tag => (
                         <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{tag}</span>
                       ))}
                     </div>
@@ -325,6 +329,7 @@ const App: React.FC = () => {
                 </div>
               ))}
             </div>
+
 
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative shadow-xl overflow-hidden">
@@ -396,7 +401,7 @@ const App: React.FC = () => {
 
                     {/* 第四排：標籤輸入 (空格分隔) */}
                     <div>
-                      <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">標籤 (空格分隔)</label>
+                      <label className="text-[13px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">標籤 (空格分隔)</label>
                       <input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.tags?.join(' ')} onChange={e => setEditForm({...editForm, tags: e.target.value as any})} />
                     </div>
 
