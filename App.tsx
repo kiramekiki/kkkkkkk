@@ -397,7 +397,7 @@ const App: React.FC = () => {
                     </div>
 
                     {/* 第五排：心得 */}
-                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">心得筆記</label><textarea className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl h-24 outline-none resize-none focus:border-[#8c7b6d]" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} /></div>
+                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">感想</label><textarea className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl h-24 outline-none resize-none focus:border-[#8c7b6d]" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} /></div>
                     
                     {/* 按鈕區 */}
                     <div className="flex gap-3 pt-2">
@@ -413,9 +413,10 @@ const App: React.FC = () => {
                         <span className="px-4 py-1 rounded-full border border-stone-200 text-[11px] font-bold text-stone-400 bg-white dark:bg-stone-800 tracking-wider">{CATEGORY_DISPLAY_MAP[expandedEntry.category]}</span>
                         <span className={`px-4 py-1 rounded-full border text-[11px] font-bold tracking-wider ${RATING_STYLES[expandedEntry.rating]}`}>{expandedEntry.rating}</span>
                       </div>
-                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight leading-tight">{expandedEntry.title}</h2>
+                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight">{expandedEntry.title}</h2>
                       <p className="text-xl text-stone-400 italic font-serif mb-12 text-left">by <span className="text-stone-500">{expandedEntry.author}</span></p>
-                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed text-left">"{expandedEntry.note}"</p></div>}
+                      {/* ★★★ 這裡已經移除 italic，大卡片感想恢復為正體 */}
+                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif leading-relaxed text-left">"{expandedEntry.note}"</p></div>}
                     </div>
                     <div className="flex items-center justify-between pt-8 border-t border-stone-100">
                       <div className="flex flex-wrap gap-2">
