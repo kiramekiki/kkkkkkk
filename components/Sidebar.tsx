@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             <div className="mb-6">
               {/* 標題：縮小至 text-base (16px)，增加字距 tracking-widest */}
               <h3 className="text-base font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-widest">
-                請我喝一杯手搖 🥤
+                請我喝一杯手搖🧋
               </h3>
               {/* 副標題：保持 11px，呈現精緻註解感 */}
               <p className="text-[11px] text-[#A8A29E] font-medium mt-1 tracking-wider opacity-80">
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
 
               {/* 右側：普通 */}
               <div className="flex flex-col items-center">
-                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-2">普通</span>
+                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-2">贊助</span>
                 <SupportStamp 
                   imgSrc="/support-tea.png" 
                   link="https://qr.opay.tw/jjWD2"
