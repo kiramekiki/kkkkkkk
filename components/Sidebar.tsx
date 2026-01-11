@@ -84,14 +84,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* --- 贊助區域：縮小字體版本 --- */}
+          {/* --- 贊助區域：極簡精緻版 --- */}
           <div className="mt-auto pt-6 border-t border-stone-300/30 text-center">
             <div className="mb-6">
-              {/* 標題：改為 text-lg (更和諧的大小) */}
-              <h3 className="text-lg font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-tight">
+              {/* 標題：縮小至 text-base (16px)，增加字距 tracking-widest */}
+              <h3 className="text-base font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-widest">
                 請我喝一杯手搖 🥤
               </h3>
-              {/* 副標題：text-[11px] (更精緻的比例) */}
+              {/* 副標題：保持 11px，呈現精緻註解感 */}
               <p className="text-[11px] text-[#A8A29E] font-medium mt-1 tracking-wider opacity-80">
                 四捨五入算是一種推金幣
               </p>
