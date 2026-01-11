@@ -118,8 +118,9 @@ const App: React.FC = () => {
     } catch (err) { alert('更新發生錯誤'); }
   };
 
-  // --- 【標註區域 2：合併後的 stats (唯一一組)】 ---
-  // ★★★ 這是頁尾讀取的數據，確保不重複定義
+// --- 【修正重點：數據計算區域 - 完整版】 ---
+  
+  // 1. 定義 stats (負責頁尾統計)
   const stats = useMemo(() => ({
     total: entries.length,
     manga: entries.filter(e => e.category === Category.MANGA).length,
@@ -127,9 +128,9 @@ const App: React.FC = () => {
     movie: entries.filter(e => e.category === Category.MOVIE).length
   }), [entries]);
 
-  // --- 【標註區域 3：合併後的 processedEntries (唯一一組)】 ---
-  // ★★★ 這裡整合了篩選、複數標籤、排序以及分頁切片邏輯
+  // 2. 定義 paginatedEntries (負責篩選、排序、分頁)
   const { paginatedEntries, totalPages } = useMemo(() => {
+    // A. 篩選
     let filtered = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
@@ -138,16 +139,26 @@ const App: React.FC = () => {
       const matchesTags = selectedTags.length === 0 || selectedTags.every(t => entryTags.includes(t));
       return matchesCategory && matchesRating && matchesSearch && matchesTags;
     });
-    
-    result.sort((a, b) => {
+
+    // B. 排序 (這段不能少，按鈕才會有反應)
+    filtered.sort((a, b) => {
       if (sortBy === 'date-desc') return (b.createdAt || 0) - (a.createdAt || 0);
       if (sortBy === 'date-asc') return (a.createdAt || 0) - (b.createdAt || 0);
       const weightA = RATING_WEIGHTS[a.rating] || 0;
       const weightB = RATING_WEIGHTS[b.rating] || 0;
       return sortBy === 'rating-desc' ? weightB - weightA : weightA - weightB;
     });
-    return result;
-  }, [entries, selectedCategory, selectedRating, selectedTags, searchTerm, sortBy]);
+
+    // C. 計算分頁並切片
+    const total = Math.ceil(filtered.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    
+    return { 
+      paginatedEntries: filtered.slice(start, start + itemsPerPage), 
+      totalPages: total || 1 
+    };
+    // ★★★ 注意：這裡必須有結束括號和依賴陣列
+  }, [entries, selectedCategory, selectedRating, selectedTags, searchTerm, sortBy, currentPage]);
 
   const handleEdit = (entry: Entry) => { setEditingEntry(entry); setIsModalOpen(true); };
 
@@ -381,8 +392,8 @@ const App: React.FC = () => {
             <footer className="mt-20 pb-12">
               <div className="bg-[#8b5e3c] dark:bg-stone-800 rounded-2xl p-8 md:p-12 text-center text-white relative shadow-xl overflow-hidden">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-serif font-medium mb-3 tracking-widest text-white">撒下的百合花</h3>
-                  <p className="text-sm opacity-80 mb-10 text-white font-light">儘量記錄看過的作品，留存當下的情緒</p>
+                  <h3 className="text-3xl font-serif font-medium mb-4 tracking-widest text-white">撒下的百合花</h3>
+                  <p className="text-sm opacity-90 mb-10 text-white font-light">儘量記錄看過的作品，留存當下的情緒</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                     {[ { v: entries.length, l: '總收藏' }, { v: entries.filter(e => e.category === Category.MANGA).length, l: '漫畫' }, { v: entries.filter(e => e.category === Category.NOVEL).length, l: '小說' }, { v: entries.filter(e => e.category === Category.MOVIE).length, l: '電影' } ].map(s => (
                       <div key={s.l} className="bg-white/10 rounded-xl p-6 border border-white/10 backdrop-blur-sm flex flex-col items-center justify-center h-32">
