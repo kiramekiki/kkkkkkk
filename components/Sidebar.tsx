@@ -9,7 +9,7 @@ interface SidebarProps {
   onSelectCategory: (cat: any) => void;
 }
 
-// 核心組件：純淨版郵票按鈕
+// 核心組件：純淨版郵票按鈕 (無任何邊框或線條)
 const SupportStamp = ({ 
   imgSrc, 
   link 
@@ -23,7 +23,6 @@ const SupportStamp = ({
     rel="noopener noreferrer" 
     className="group relative flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
   >
-    {/* 尺寸微調為 w-24，維持精緻感 */}
     <div className="relative w-24 h-24 flex items-center justify-center">
       <img 
         src={imgSrc} 
@@ -58,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
           
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-serif font-bold tracking-tight">分類導覽</h2>
-            <button onClick={onClose} className="p-1 hover:bg-white/50 rounded-full transition-colors"><X size={24} /></button>
+            <button onClick={onClose} className="p-1 hover:bg-white/50 rounded-full transition-colors text-stone-400"><X size={24} /></button>
           </div>
 
           <div className="mb-8 text-[13px] text-[#A8A29E] font-medium tracking-tight text-left">
@@ -85,13 +84,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* --- 贊助區域：和諧化字體與佈局 --- */}
+          {/* --- 贊助區域：縮小字體版本 --- */}
           <div className="mt-auto pt-6 border-t border-stone-300/30 text-center">
             <div className="mb-6">
-              <h3 className="text-xl font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-tight">
+              {/* 標題：改為 text-lg (更和諧的大小) */}
+              <h3 className="text-lg font-serif font-bold text-[#5E5045] dark:text-stone-100 tracking-tight">
                 請我喝一杯手搖 🥤
               </h3>
-              <p className="text-[12px] text-[#A8A29E] font-medium mt-1 tracking-wider">
+              {/* 副標題：text-[11px] (更精緻的比例) */}
+              <p className="text-[11px] text-[#A8A29E] font-medium mt-1 tracking-wider opacity-80">
                 四捨五入算是一種推金幣
               </p>
             </div>
@@ -99,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             <div className="flex justify-center gap-4 mb-6">
               {/* 左側：TWQR */}
               <div className="flex flex-col items-center">
-                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-1">TWQR</span>
+                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-2">TWQR</span>
                 <SupportStamp 
                   imgSrc="/support-garden.png" 
                   link="https://qr.opay.tw/8yfYV"
@@ -108,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
 
               {/* 右側：普通 */}
               <div className="flex flex-col items-center">
-                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-1">普通</span>
+                <span className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-widest mb-2">普通</span>
                 <SupportStamp 
                   imgSrc="/support-tea.png" 
                   link="https://qr.opay.tw/jjWD2"
