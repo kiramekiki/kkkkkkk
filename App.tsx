@@ -354,7 +354,10 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => { if(!isEditingExpanded) setExpandedEntry(null); }} />
           <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
-             <div className="md:w-[45%] bg-stone-100 flex-shrink-0"><img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt="" /></div>
+               {/* ★★★ 重點 1：圖片容器改為 object-contain 防止切圖 --- */}
+             <div className="md:w-[45%] bg-stone-200/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <img src={expandedEntry.coverUrl} className="w-full h-full object-contain" alt="" />
+             </div>
              
    {/* ★★★ 重點 4：右側加入捲軸控制 overflow-y-auto */}
              <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar text-left text-stone-800 dark:text-stone-100">
