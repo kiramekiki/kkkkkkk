@@ -78,41 +78,49 @@ const App: React.FC = () => {
     setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
   };
 
-  // ★★★ 【更改 4：原地儲存邏輯】
+   // ★★★ 【重點修改：帶密碼驗證的原地儲存邏輯】
   const handleInlineSave = async () => {
     if (!expandedEntry) return;
+    
+    const password = prompt('請輸入管理員密碼以儲存更改：');
+    if (!password) return;
+
+    // 將標籤字串轉回陣列
+    const finalTags = typeof editForm.tags === 'string' 
+      ? (editForm.tags as string).split(/\s+/).filter(t => t.length > 0)
+      : expandedEntry.tags;
+
     try {
       const response = await fetch('/api/update', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ ...expandedEntry, ...editForm }) 
+        body: JSON.stringify({ 
+          ...expandedEntry, 
+          ...editForm, 
+          tags: finalTags,
+          password // 將密碼傳送至後端驗證
+        }) 
       });
+      
       if (response.ok) {
         setIsEditingExpanded(false);
-        setExpandedEntry({ ...expandedEntry, ...editForm } as Entry);
+        setExpandedEntry({ ...expandedEntry, ...editForm, tags: finalTags } as Entry);
         fetchEntries();
-      } else { alert('儲存失敗'); }
+        alert('儲存成功！');
+      } else {
+        const errData = await response.json();
+        alert(errData.error || '儲存失敗，請檢查密碼');
+      }
     } catch (err) { alert('更新發生錯誤'); }
   };
 
-  const stats = useMemo(() => ({
-    total: entries.length,
-    manga: entries.filter(e => e.category === Category.MANGA).length,
-    novel: entries.filter(e => e.category === Category.NOVEL).length,
-    movie: entries.filter(e => e.category === Category.MOVIE).length
-  }), [entries]);
-  
-  // ★★★ 【更改 5：修正後的單一篩選邏輯（整合標籤篩選與排序）】
   const processedEntries = useMemo(() => {
     let result = [...entries].filter(entry => {
       const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory;
       const matchesRating = selectedRating === 'ALL' || entry.rating === selectedRating;
       const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) || entry.author.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // 這裡實現交集篩選：必須包含「所有」選中的標籤
       const entryTags = Array.isArray(entry.tags) ? entry.tags : [];
       const matchesTags = selectedTags.length === 0 || selectedTags.every(t => entryTags.includes(t));
-      
       return matchesCategory && matchesRating && matchesSearch && matchesTags;
     });
   
@@ -340,29 +348,65 @@ const App: React.FC = () => {
 
       <AddEntryModal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setEditingEntry(null);}} onRefresh={fetchEntries} entry={editingEntry} />
       
-      {/* ★★★ 【功能新增：大卡片原地編輯模式】 */}
+     {/* ★★★ 【核心修改：大卡片 - 加入完整原地編輯功能】 */}
       {expandedEntry && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => { if(!isEditingExpanded) setExpandedEntry(null); }} />
           <div className="relative bg-[#fbf7f3] dark:bg-[#1a1917] rounded-3xl overflow-hidden max-w-[950px] w-full shadow-2xl flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 border border-stone-200">
-             <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110"><X size={20} /></button>
+             <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
              <div className="md:w-[45%] bg-stone-100 flex-shrink-0"><img src={expandedEntry.coverUrl} className="w-full h-full object-cover" alt="" /></div>
              
              <div className="flex-1 p-8 md:p-14 flex flex-col justify-between overflow-y-auto custom-scrollbar text-left text-stone-800 dark:text-stone-100">
                 {isEditingExpanded ? (
-                  /* --- 編輯模式 --- */
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-stone-400 uppercase tracking-widest mb-4">正在原地編輯資料</h2>
-                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">標題</label><input className="w-full p-3 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d] transition-all" defaultValue={expandedEntry.title} onChange={e => setEditForm({...editForm, title: e.target.value})} /></div>
-                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">作者</label><input className="w-full p-3 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d] transition-all" defaultValue={expandedEntry.author} onChange={e => setEditForm({...editForm, author: e.target.value})} /></div>
-                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">心得</label><textarea className="w-full p-3 bg-white text-stone-800 border border-stone-200 rounded-xl h-32 outline-none resize-none focus:border-[#8c7b6d] transition-all" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} /></div>
-                    <div className="flex gap-3 pt-4">
-                      <button onClick={handleInlineSave} className="flex-1 py-4 bg-[#8c7b6d] text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"><Save size={18}/>儲存更改</button>
-                      <button onClick={() => setIsEditingExpanded(false)} className="px-8 py-4 bg-stone-100 dark:bg-stone-800 text-stone-500 rounded-2xl font-bold">取消</button>
+                  /* --- 完整編輯模式介面 (比照截圖排列) --- */
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold text-stone-400 uppercase tracking-widest mb-4">原地編輯資料</h2>
+                    
+                    {/* 第一排：標題與作者 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">標題</label><input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d]" defaultValue={expandedEntry.title} onChange={e => setEditForm({...editForm, title: e.target.value})} /></div>
+                      <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">作者</label><input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none focus:border-[#8c7b6d]" defaultValue={expandedEntry.author} onChange={e => setEditForm({...editForm, author: e.target.value})} /></div>
+                    </div>
+
+                    {/* 第二排：封面網址與噗浪網址 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">封面圖片網址</label><input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.coverUrl} onChange={e => setEditForm({...editForm, coverUrl: e.target.value})} /></div>
+                      <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">Plurk 網址</label><input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.plurkUrl} onChange={e => setEditForm({...editForm, plurkUrl: e.target.value})} /></div>
+                    </div>
+
+                    {/* 第三排：分類與評價下拉選單 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">分類</label>
+                        <select className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none appearance-none cursor-pointer" defaultValue={expandedEntry.category} onChange={e => setEditForm({...editForm, category: e.target.value as Category})}>
+                           {Object.values(Category).map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">心中定位</label>
+                        <select className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none appearance-none cursor-pointer" defaultValue={expandedEntry.rating} onChange={e => setEditForm({...editForm, rating: e.target.value as Rating})}>
+                           {Object.values(Rating).map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 第四排：標籤輸入 (空格分隔) */}
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">標籤 (空格分隔)</label>
+                      <input className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl outline-none" defaultValue={expandedEntry.tags?.join(' ')} onChange={e => setEditForm({...editForm, tags: e.target.value as any})} />
+                    </div>
+
+                    {/* 第五排：心得 */}
+                    <div><label className="text-[10px] font-bold text-stone-400 block mb-1 uppercase tracking-widest">心得筆記</label><textarea className="w-full p-2.5 bg-white text-stone-800 border border-stone-200 rounded-xl h-24 outline-none resize-none focus:border-[#8c7b6d]" defaultValue={expandedEntry.note} onChange={e => setEditForm({...editForm, note: e.target.value})} /></div>
+                    
+                    {/* 按鈕區 */}
+                    <div className="flex gap-3 pt-2">
+                      <button onClick={handleInlineSave} className="flex-1 py-3 bg-[#8c7b6d] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"><Save size={18}/>儲存更改 (需密碼)</button>
+                      <button onClick={() => setIsEditingExpanded(false)} className="px-8 py-3 bg-stone-100 dark:bg-stone-800 text-stone-500 rounded-2xl font-bold">取消</button>
                     </div>
                   </div>
                 ) : (
-                  /* --- 顯示模式 --- */
+                  /* --- 顯示模式 (原設計) --- */
                   <div className="flex flex-col h-full justify-between">
                     <div>
                       <div className="flex gap-3 mb-8">
@@ -370,8 +414,8 @@ const App: React.FC = () => {
                         <span className={`px-4 py-1 rounded-full border text-[11px] font-bold tracking-wider ${RATING_STYLES[expandedEntry.rating]}`}>{expandedEntry.rating}</span>
                       </div>
                       <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-3 tracking-tight leading-tight">{expandedEntry.title}</h2>
-                      <p className="text-xl text-stone-400 italic font-serif mb-12">by <span className="text-stone-500">{expandedEntry.author}</span></p>
-                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed">"{expandedEntry.note}"</p></div>}
+                      <p className="text-xl text-stone-400 italic font-serif mb-12 text-left">by <span className="text-stone-500">{expandedEntry.author}</span></p>
+                      {expandedEntry.note && <div className="relative pl-10 mb-12 border-l border-stone-200"><p className="text-lg text-stone-600 dark:text-stone-400 font-serif italic leading-relaxed text-left">"{expandedEntry.note}"</p></div>}
                     </div>
                     <div className="flex items-center justify-between pt-8 border-t border-stone-100">
                       <div className="flex flex-wrap gap-2">
