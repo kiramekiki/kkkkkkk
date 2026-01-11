@@ -9,7 +9,7 @@ interface SidebarProps {
   onSelectCategory: (cat: any) => void;
 }
 
-// ★★★ 核心組件：圓弧文字郵票按鈕
+// 核心組件：中文字體優化版的圓弧文字郵票按鈕
 const SupportStamp = ({ 
   imgSrc, 
   topText, 
@@ -25,34 +25,32 @@ const SupportStamp = ({
     href={link} 
     target="_blank" 
     rel="noopener noreferrer" 
-    className="group relative flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+    className="group relative flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
   >
-    <div className="relative w-20 h-20 flex items-center justify-center">
-      {/* 郵票圖片 */}
+    {/* 容器 w-32 h-32 */}
+    <div className="relative w-32 h-32 flex items-center justify-center">
       <img 
         src={imgSrc} 
-        className="w-[75%] h-[75%] object-contain drop-shadow-sm opacity-90 group-hover:opacity-100 transition-opacity" 
+        className="w-[82%] h-[82%] object-contain drop-shadow-md opacity-95 group-hover:opacity-100 transition-opacity" 
         alt="support icon" 
       />
       
-      {/* SVG 圓弧文字 */}
+      {/* SVG 圓弧文字層：中文字體稍微放大一點到 9px */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
         <defs>
-          {/* 上半部路徑 */}
-          <path id="pathTop" d="M 20,50 A 30,30 0 0,1 80,50" fill="transparent" />
-          {/* 下半部路徑 */}
-          <path id="pathBottom" d="M 20,50 A 30,30 0 0,0 80,50" fill="transparent" />
+          <path id="pathTop" d="M 18,50 A 32,32 0 0,1 82,50" fill="transparent" />
+          <path id="pathBottom" d="M 18,50 A 32,32 0 0,0 82,50" fill="transparent" />
         </defs>
         
-        {/* 上半部文字 */}
-        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[7px] font-bold tracking-[0.15em] uppercase">
+        {/* 上半部中文字 */}
+        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[9px] font-bold tracking-[0.1em]">
           <textPath href="#pathTop" startOffset="50%" textAnchor="middle">
             {topText}
           </textPath>
         </text>
         
-        {/* 下半部文字 */}
-        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[7px] font-bold tracking-[0.15em] uppercase">
+        {/* 下半部中文字 */}
+        <text className="fill-[#A8A29E] dark:fill-stone-400 text-[9px] font-bold tracking-[0.1em]">
           <textPath href="#pathBottom" startOffset="50%" textAnchor="middle">
             {bottomText}
           </textPath>
@@ -89,12 +87,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             <button onClick={onClose} className="p-1 hover:bg-white/50 rounded-full transition-colors"><X size={24} /></button>
           </div>
 
-          <div className="mb-10 text-[13px] text-[#A8A29E] font-medium tracking-tight text-left">
+          <div className="mb-8 text-[13px] text-[#A8A29E] font-medium tracking-tight text-left">
             <p>圖書登記清單</p>
             <p>百合花開的世界</p>
           </div>
 
-          <nav className="flex-1 space-y-1">
+          <nav className="flex-1 space-y-1 overflow-y-auto hide-scrollbar">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isSelected = selectedCategory === item.id;
@@ -113,29 +111,37 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, selectedCategory, on
             })}
           </nav>
 
-          {/* ★★★ 新增：支持圖書館區塊 */}
+          {/* 贊助區域：依照要求標註左右與更換文字 --- */}
           <div className="mt-auto pt-6 border-t border-stone-300/30">
-            <p className="text-[9px] font-bold text-[#A8A29E] uppercase tracking-[0.2em] mb-4 text-center">
-              Support the Library
-            </p>
-            <div className="flex justify-center gap-4 mb-6">
-              {/* 澆花器按鈕 */}
-              <SupportStamp 
-                imgSrc="/support-garden.png" 
-                topText="GARDEN CARE" 
-                bottomText="KEEP IT GROWING" 
-                link="https://qr.opay.tw/8yfYV"
-              />
-              {/* 手搖飲按鈕 */}
-              <SupportStamp 
-                imgSrc="/support-tea.png" 
-                topText="SUGAR BOOST" 
-                bottomText="BUY ME A DRINK" 
-                link="https://qr.opay.tw/jjWD2"
-              />
+            <h3 className="text-sm font-bold text-[#5E5045] dark:text-stone-300 text-center mb-6 tracking-widest">
+              請我喝一杯手搖 🧋
+            </h3>
+            
+            <div className="flex justify-center gap-2">
+              {/* 左側：TWQR - 澆花器 */}
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-bold text-[#A8A29E] mb-1">TWQR</span>
+                <SupportStamp 
+                  imgSrc="/support-garden.png" 
+                  topText="四捨" 
+                  bottomText="五入" 
+                  link="https://qr.opay.tw/8yfYV"
+                />
+              </div>
+
+              {/* 右側：普通 - 手搖飲 */}
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-bold text-[#A8A29E] mb-1">普通</span>
+                <SupportStamp 
+                  imgSrc="/support-tea.png" 
+                  topText="算是一種" 
+                  bottomText="推金幣" 
+                  link="https://qr.opay.tw/jjWD2"
+                />
+              </div>
             </div>
             
-            <div className="text-center">
+            <div className="text-center mt-4">
               <p className="text-[10px] text-[#A8A29E] opacity-50 font-serif italic">Lily Library © 2026</p>
             </div>
           </div>
