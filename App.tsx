@@ -224,6 +224,10 @@ const App: React.FC = () => {
               <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
                 <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🗡️</div>
                 <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同就完全沒有意義。</p>
+                 {/* ★★★ 新增：暴雷警示語 ★★★ */}
+                <p className="text-stone-400 text-[13px] text-center mb-6 mt-1 font-medium">
+                  以暴雷的前提在寫感想，請小心。</p>
+                
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
                   <span><b>聖經</b>：某種神的旨意</span>
                   <span><b>極品</b>：印象深刻且強勁或全方位優質</span>
