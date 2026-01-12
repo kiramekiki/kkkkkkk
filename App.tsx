@@ -187,6 +187,7 @@ const App: React.FC = () => {
     { id: Rating.BIBLE, label: '聖經', emoji: '👑' },
     { id: Rating.TOP_TIER, label: '極品', emoji: '🌹' },
     { id: Rating.DESTINY, label: '頂級', emoji: '✨' },
+   { id: Rating.EXCELLENT, label: '優質', emoji: '🍵' },
     { id: Rating.ORDINARY, label: '普通', emoji: '☕' },
     { id: Rating.MYSTERIOUS, label: '神秘', emoji: '🔮' },
   ];
