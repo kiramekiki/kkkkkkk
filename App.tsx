@@ -228,6 +228,7 @@ const App: React.FC = () => {
                   <span><b>聖經</b>：某種神的旨意</span>
                   <span><b>極品</b>：印象深刻且強勁或全方位優質</span>
                   <span><b>頂級</b>：難能可貴</span>
+                  <span><b>優質</b>：不錯</span>
                   <span><b>普通</b>：普通</span>
                   <span><b>神秘</b>：沒有緣分</span>
                 </div>
