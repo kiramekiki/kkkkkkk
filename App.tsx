@@ -223,9 +223,11 @@ const App: React.FC = () => {
               {/* 使用指南方塊 */}
               <div className="max-w-3xl mx-auto bg-stone-100/30 dark:bg-stone-800/30 p-8 rounded-xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm">
                 <div className="font-bold text-stone-700 dark:text-stone-200 mb-3 text-base">使用指南 🗡️</div>
-                <p className="text-stone-500 text-sm mb-6 text-center">純粹只是一部分的個人感受，如果電波不同就完全沒有意義。</p>
-                <p>以暴雷的前提在寫感想，請小心。</p>
-              </div>
+              {/* 感想描述區域：分兩行呈現 */}
+                <div className="text-stone-500 text-sm text-center leading-relaxed mb-6">
+                  <p>純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
+                  <p>以暴雷的前提在寫感想，請小心。</p>
+                </div>
                 
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
                   <span><b>聖經</b>：某種神的旨意</span>
