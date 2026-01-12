@@ -346,7 +346,7 @@ const App: React.FC = () => {
                       {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 text-left leading-relaxed whitespace-pre-wrap">"{entry.note}"</p>}
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {entry.tags?.slice(0, 3).map(tag => (
+                      {entry.tags?.slice(0, 6).map(tag => (
                         <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{tag}</span>
                       ))}
                     </div>
