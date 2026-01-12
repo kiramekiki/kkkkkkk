@@ -13,6 +13,7 @@ export enum Rating {
   BIBLE = '聖經',
   TOP_TIER = '極品',
   DESTINY = '頂級',
+  EXCELLENT = '優質',
   ORDINARY = '普通',
   MYSTERIOUS = '神秘'
 }
