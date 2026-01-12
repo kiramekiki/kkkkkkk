@@ -35,12 +35,13 @@ export const RATING_STYLES: Record<Rating, string> = {
   [Rating.BIBLE]: 'bg-amber-50 text-amber-700 border-amber-200',
   [Rating.TOP_TIER]: 'bg-rose-50 text-rose-700 border-rose-200',
   [Rating.DESTINY]: 'bg-blue-50 text-blue-700 border-blue-200',
+  [Rating.EXCELLENT]: 'bg-teal-50 text-teal-700 border-teal-200',
   [Rating.ORDINARY]: 'bg-stone-50 text-stone-700 border-stone-200',
   [Rating.MYSTERIOUS]: 'bg-purple-50 text-purple-700 border-purple-200',
 };
 
 export const RATING_WEIGHTS: Record<Rating, number> = {
-  [Rating.BIBLE]: 5, [Rating.TOP_TIER]: 4, [Rating.DESTINY]: 3, [Rating.ORDINARY]: 2, [Rating.MYSTERIOUS]: 1,
+  [Rating.BIBLE]: 6, [Rating.TOP_TIER]: 5, [Rating.DESTINY]: 4, [Rating.EXCELLENT]: 3,  [Rating.ORDINARY]: 2, [Rating.MYSTERIOUS]: 1,
 };
 
 export const CATEGORY_STYLES: Record<string, string> = {
@@ -58,5 +59,5 @@ export const CATEGORY_DISPLAY_MAP: Record<string, string> = {
   [Category.GAME]: 'GAME',
   [Category.DRAMA_SERIES]: 'DRAMA',
   [Category.GAY]: 'GAY',
-   [Category. OTHER]:'OTHER'
+  [Category. OTHER]:'OTHER'
 };
