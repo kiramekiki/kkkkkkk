@@ -226,7 +226,8 @@ const App: React.FC = () => {
               {/* 感想描述區域：分兩行呈現 */}
                 <div className="text-stone-500 text-sm text-center leading-relaxed mb-6">
                   <p>純粹只是一部分的個人感受，如果電波不同則完全沒有意義。</p>
-                  <p>以暴雷的前提在寫感想，請小心。</p>
+                  <p>優質以上都很值得一看。</p>
+                  <p>以暴雷的前提在寫感想，而且一點營養也沒有。</p>
                 </div>
                 
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] border-t border-stone-200/60 pt-5">
