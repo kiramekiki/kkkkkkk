@@ -334,13 +334,24 @@ const App: React.FC = () => {
               </div>
             )}
             
-            {/* 卡片區域：改用分頁後的 paginatedEntries */}
+           {/* 卡片區域：改用分頁後的 paginatedEntries */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {paginatedEntries.map((entry) => (
                 <div key={entry.id} onClick={() => { setExpandedEntry(entry); setIsEditingExpanded(false); }} className="flex bg-white dark:bg-[#202020] rounded-lg overflow-hidden border border-stone-100 dark:border-stone-800 shadow-soft hover:shadow-md transition-all cursor-pointer group h-48 relative text-left">
-                  <div className="w-32 bg-stone-100 flex-shrink-0 relative">
-                     {/* ★★★ 增加 loading="lazy" 優化載入速度 */}
-                     <img src={entry.coverUrl} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" alt="" loading="lazy" />
+                  <div className="w-32 bg-stone-100 flex-shrink-0 relative overflow-hidden">
+                     {/* ★★★ 修改 1：加入強制硬體加速與平滑化樣式 */}
+                     <img 
+                        src={entry.coverUrl} 
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity transform-gpu" 
+                        alt={entry.title} 
+                        loading="lazy" 
+                        // ★★★ 修改 2：增加內聯樣式提升渲染品質
+                        style={{ 
+                          imageRendering: 'auto', 
+                          backfaceVisibility: 'hidden',
+                          transform: 'translateZ(0)' 
+                        }}
+                     />
                   </div>
                   <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden">
                     <div>
@@ -350,11 +361,11 @@ const App: React.FC = () => {
                       </div>
                       <h3 className="text-xl font-serif font-bold text-stone-800 dark:text-stone-100 mb-1 leading-tight line-clamp-1">{entry.title}</h3>
                       <p className="text-xs text-stone-500 mb-2 text-left">by {entry.author}</p>
-                      {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 text-left leading-relaxed whitespace-pre-wrap">"{entry.note}"</p>}
+                      {entry.note && <p className="text-sm text-stone-600 dark:text-stone-400 italic line-clamp-2 leading-relaxed text-left whitespace-pre-wrap">"{entry.note}"</p>}
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {entry.tags?.slice(0, 6).map(tag => (
-                        <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 hover:bg-stone-200'}`}>#{tag}</span>
+                        <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-50 hover:bg-stone-200'}`}>#{tag}</span>
                       ))}
                     </div>
                   </div>
