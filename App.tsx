@@ -365,7 +365,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {entry.tags?.slice(0, 6).map(tag => (
-                        <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-50 hover:bg-stone-200'}`}>#{tag}</span>
+                        <span key={tag} onClick={(e) => { e.stopPropagation(); toggleTag(tag); }} className={`text-[10px] px-2 py-0.5 rounded transition-colors ${selectedTags.includes(tag) ? 'bg-[#8c7b6d] text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 hover:bg-stone-200'}`}>#{tag}</span>
                       ))}
                     </div>
                   </div>
