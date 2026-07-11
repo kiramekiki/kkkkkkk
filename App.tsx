@@ -25,7 +25,7 @@ const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<Category | 'ALL'>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<Category | 'ALL'>((localStorage.getItem('kcat') as any) || 'ALL'); useEffect(() => { localStorage.setItem('kcat', selectedCategory); }, [selectedCategory]);
   const [selectedRating, setSelectedRating] = useState<Rating | 'ALL'>('ALL');
   
    // ★★★ 【更改 1：狀態定義】
@@ -341,7 +341,7 @@ const App: React.FC = () => {
                   <div className="w-32 bg-stone-100 flex-shrink-0 relative overflow-hidden">
                      {/* ★★★ 修改 1：加入強制硬體加速與平滑化樣式 */}
                      <img 
-                        src={entry.coverUrl} 
+                        src={"https://wsrv.nl/?url="+encodeURIComponent(entry.coverUrl)+"&w=600&output=webp"} onError={(e)=>{if(e.currentTarget.src.indexOf("wsrv.nl")>-1)e.currentTarget.src=entry.coverUrl;}} 
                         className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity transform-gpu" 
                         alt={entry.title} 
                         loading="lazy" 
@@ -437,7 +437,7 @@ const App: React.FC = () => {
              <button onClick={() => setExpandedEntry(null)} className="absolute top-6 right-6 p-2 bg-white/90 dark:bg-stone-800 rounded-full z-10 shadow-md hover:scale-110 transition-transform"><X size={20} /></button>
                {/* ★★★ 重點 1：圖片容器改為 object-contain 防止切圖 --- */}
              <div className="md:w-[45%] bg-stone-200/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <img src={expandedEntry.coverUrl} className="w-full h-full object-contain" alt="" />
+                <img src={"https://wsrv.nl/?url="+encodeURIComponent(expandedEntry.coverUrl)+"&w=1000&output=webp"} onError={(e)=>{if(e.currentTarget.src.indexOf("wsrv.nl")>-1)e.currentTarget.src=expandedEntry.coverUrl;}} className="w-full h-full object-contain" alt="" />
              </div>
              
    {/* ★★★ 重點 4：右側加入捲軸控制 overflow-y-auto */}
